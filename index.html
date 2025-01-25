@@ -214,6 +214,19 @@
         .playlist li.active {
             background: #2563eb;
         }
+        .time-info {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+        .volume-control {
+            margin-top: 10px;
+        }
+        #volume-percent {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+            width: 40px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -233,10 +246,20 @@
                 <h2 id="title" class="text-lg font-bold">Loading...</h2>
                 <p id="artist" class="text-sm">Please wait</p>
             </div>
+            <!-- نوار پیشرفت و زمان -->
             <div class="custom-progress-bar" onclick="seek(event)">
                 <div class="custom-progress" id="custom-progress"></div>
             </div>
-            <input type="range" min="0" max="1" step="0.01" value="1" class="custom-volume-control" id="custom-volume" onchange="setVolume(this.value)">
+            <div class="time-info flex justify-between text-sm mt-1">
+                <span id="current-time">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <!-- کنترل صدا و درصد صدا -->
+            <div class="volume-control flex items-center gap-2 mt-3">
+                <input type="range" min="0" max="1" step="0.01" value="1" class="custom-volume-control" id="custom-volume" onchange="setVolume(this.value)">
+                <span id="volume-percent">100%</span>
+            </div>
+            <!-- بقیه کدهای شما -->
             <audio id="audio" style="display: none;">
                 <source id="audio-source" src="" type="audio/mp3">
                 Your browser does not support the audio element.
@@ -287,6 +310,10 @@
         const loadingPage = document.getElementById("loading-page");
         const loadingBackground = document.getElementById("loading-background");
 
+        const currentTimeElement = document.getElementById("current-time");
+        const durationElement = document.getElementById("duration");
+        const volumePercentElement = document.getElementById("volume-percent");
+
         // تابع برای نمایش صفحه لودینگ
         async function showLoadingPage(imageUrl) {
             const img = new Image();
@@ -311,6 +338,36 @@
         // فراخوانی تابع نمایش صفحه لودینگ با عکس مورد نظر
         const loadingImageUrl = "https://raw.githubusercontent.com/rzarisfi/HarfsMusic/main/loading-image.jpg";
         showLoadingPage(loadingImageUrl);
+
+        // تابع برای تبدیل زمان به فرمت دقیقه:ثانیه
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+
+        // به‌روزرسانی زمان موزیک و نوار پیشرفت
+        audio.addEventListener("timeupdate", () => {
+            const progressPercent = (audio.currentTime / audio.duration) * 100;
+            customProgress.style.width = `${progressPercent}%`;
+
+            // نمایش زمان فعلی و کل زمان
+            currentTimeElement.textContent = formatTime(audio.currentTime);
+            durationElement.textContent = formatTime(audio.duration);
+        });
+
+        // به‌روزرسانی درصد صدا
+        audio.addEventListener("volumechange", () => {
+            const volumePercent = Math.round(audio.volume * 100);
+            volumePercentElement.textContent = `${volumePercent}%`;
+        });
+
+        // تنظیم صدا و به‌روزرسانی درصد صدا
+        function setVolume(volume) {
+            audio.volume = volume;
+            const volumePercent = Math.round(volume * 100);
+            volumePercentElement.textContent = `${volumePercent}%`;
+        }
 
         // بقیه کدهای شما...
         async function fetchTracks() {
@@ -428,10 +485,6 @@
             audio.loop = isRepeatOne;
         }
 
-        function setVolume(volume) {
-            audio.volume = volume;
-        }
-
         function seek(event) {
             const progressBar = event.currentTarget;
             const clickPosition = event.offsetX;
@@ -439,11 +492,6 @@
             const seekTime = (clickPosition / totalWidth) * audio.duration;
             audio.currentTime = seekTime;
         }
-
-        audio.addEventListener("timeupdate", () => {
-            const progressPercent = (audio.currentTime / audio.duration) * 100;
-            customProgress.style.width = `${progressPercent}%`;
-        });
 
         audio.addEventListener("ended", () => {
             if (isRepeatOne) {
