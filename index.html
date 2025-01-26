@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS Music Player V0.5 </title>
+    <title>HARFS Music Player V0.5</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -47,11 +47,11 @@
         @keyframes zoomIn {
             0% {
                 transform: scale(1);
-                filter: blur(0); /* بدون بلور در ابتدا */
+                filter: blur(0);
             }
             100% {
                 transform: scale(1.2);
-                filter: blur(20px); /* بلور در انتها */
+                filter: blur(20px);
             }
         }
 
@@ -113,6 +113,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             text-align: center;
             width: 100%;
+            position: relative;
         }
         .music-player img {
             width: 100%;
@@ -120,6 +121,49 @@
             border-radius: 15px;
             margin: 0 auto 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out; /* افکت زوم */
+        }
+        .music-player img:hover {
+            transform: scale(1.1); /* زوم روی کاور */
+        }
+        .playlist {
+            background: rgba(0, 0, 0, 0.7); /* تیره‌تر شدن لیست */
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            overflow-y: auto;
+            max-height: 300px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .playlist.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .playlist ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .playlist li {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            transition: background 0.3s;
+        }
+        .playlist li:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .playlist li.active {
+            background: #2563eb;
         }
         .controls button {
             margin: 0 5px;
@@ -186,47 +230,6 @@
             border-radius: 50%;
             cursor: pointer;
         }
-        .playlist {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            overflow-y: auto;
-            max-height: 300px;
-        }
-        .playlist ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .playlist li {
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 10px;
-            margin-bottom: 5px;
-            transition: background 0.3s;
-        }
-        .playlist li:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .playlist li.active {
-            background: #2563eb;
-        }
-        .time-info {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.875rem;
-        }
-        .volume-control {
-            margin-top: 10px;
-        }
-        #volume-percent {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.875rem;
-            width: 40px;
-            text-align: right;
-        }
     </style>
 </head>
 <body>
@@ -242,11 +245,14 @@
     <div class="music-container">
         <div class="music-player">
             <img id="cover" src="https://via.placeholder.com/300x300" alt="Album Cover">
+            <div class="playlist" id="playlist">
+                <h3 class="text-lg font-bold mb-4">Playlist</h3>
+                <ul id="playlist-list"></ul>
+            </div>
             <div class="track-info">
                 <h2 id="title" class="text-lg font-bold">Loading...</h2>
                 <p id="artist" class="text-sm">Please wait</p>
             </div>
-            <!-- نوار پیشرفت و زمان -->
             <div class="custom-progress-bar" onclick="seek(event)">
                 <div class="custom-progress" id="custom-progress"></div>
             </div>
@@ -254,12 +260,10 @@
                 <span id="current-time">0:00</span>
                 <span id="duration">0:00</span>
             </div>
-            <!-- کنترل صدا و درصد صدا -->
             <div class="volume-control flex items-center gap-2 mt-3">
                 <input type="range" min="0" max="1" step="0.01" value="1" class="custom-volume-control" id="custom-volume" onchange="setVolume(this.value)">
                 <span id="volume-percent">100%</span>
             </div>
-            <!-- بقیه کدهای شما -->
             <audio id="audio" style="display: none;">
                 <source id="audio-source" src="" type="audio/mp3">
                 Your browser does not support the audio element.
@@ -277,11 +281,11 @@
                 <button onclick="nextTrack()">
                     <i class="fas fa-forward"></i>
                 </button>
+                <!-- دکمه نمایش/مخفی کردن لیست -->
+                <button id="toggle-playlist" class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-list"></i> <!-- فقط آیکون -->
+                </button>
             </div>
-        </div>
-        <div class="playlist">
-            <h3 class="text-lg font-bold mb-4">Playlist</h3>
-            <ul id="playlist"></ul>
         </div>
     </div>
 
@@ -303,16 +307,18 @@
         const customProgress = document.getElementById("custom-progress");
         const customVolume = document.getElementById("custom-volume");
         const playlistElement = document.getElementById("playlist");
+        const playlistList = document.getElementById("playlist-list");
         const background = document.getElementById("background");
         const shuffleRepeatButton = document.getElementById("shuffle-repeat");
         const playPauseButton = document.getElementById("play-pause");
-
-        const loadingPage = document.getElementById("loading-page");
-        const loadingBackground = document.getElementById("loading-background");
+        const togglePlaylistButton = document.getElementById("toggle-playlist");
 
         const currentTimeElement = document.getElementById("current-time");
         const durationElement = document.getElementById("duration");
         const volumePercentElement = document.getElementById("volume-percent");
+
+        const loadingPage = document.getElementById("loading-page");
+        const loadingBackground = document.getElementById("loading-background");
 
         // تابع برای نمایش صفحه لودینگ
         async function showLoadingPage(imageUrl) {
@@ -399,7 +405,7 @@
         }
 
         function renderPlaylist() {
-            playlistElement.innerHTML = tracks
+            playlistList.innerHTML = tracks
                 .map((track, index) => `
                     <li onclick="playTrack(${index})" class="${index === currentTrackIndex ? 'active' : ''}">
                         ${track.title}
@@ -411,7 +417,7 @@
         function playTrack(index) {
             currentTrackIndex = index;
             loadTrack(currentTrackIndex);
-            renderPlaylist();
+            playlistElement.classList.remove("show"); // مخفی کردن لیست پس از انتخاب آهنگ
         }
 
         function loadTrack(index) {
@@ -502,6 +508,11 @@
             } else if (isShuffle) {
                 nextTrack();
             }
+        });
+
+        // نمایش/مخفی کردن لیست آهنگ‌ها
+        togglePlaylistButton.addEventListener("click", () => {
+            playlistElement.classList.toggle("show");
         });
 
         fetchTracks();
