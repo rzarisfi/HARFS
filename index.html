@@ -326,6 +326,7 @@
             img.src = imageUrl;
             img.onload = () => {
                 loadingBackground.style.backgroundImage = `url(${imageUrl})`;
+                background.style.backgroundImage = `url(${imageUrl})`; // تنظیم پس‌زمینه بلور شده
                 loadingPage.style.display = "flex";
 
                 setTimeout(() => {
@@ -431,12 +432,10 @@
             const img = new Image();
             img.src = track.cover;
             img.onload = () => {
-                cover.src = track.cover;
-                background.style.backgroundImage = `url(${track.cover})`;
+                cover.src = track.cover; // فقط کاور آهنگ تغییر می‌کند
             };
             img.onerror = () => {
                 cover.src = "https://via.placeholder.com/300x300";
-                background.style.backgroundImage = `url(https://via.placeholder.com/300x300)`;
             };
         }
 
