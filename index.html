@@ -115,19 +115,44 @@
             width: 100%;
             position: relative;
         }
+        .cover-and-volume {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            justify-content: center;
+        }
         .music-player img {
             width: 100%;
             max-width: 200px;
             border-radius: 15px;
             margin: 0 auto 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease-in-out; /* افکت زوم */
+            transition: transform 0.3s ease-in-out;
         }
         .music-player img:hover {
-            transform: scale(1.1); /* زوم روی کاور */
+            transform: scale(1.1);
+        }
+        .volume-control.vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .volume-control.vertical input[type="range"] {
+            -webkit-appearance: slider-vertical;
+            width: 5px;
+            height: 100px;
+        }
+        .volume-control.vertical input[type="range"]::-webkit-slider-thumb {
+            width: 15px;
+            height: 15px;
+        }
+        .volume-control.vertical input[type="range"]::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
         }
         .playlist {
-            background: rgba(0, 0, 0, 0.7); /* تیره‌تر شدن لیست */
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 20px;
@@ -199,37 +224,6 @@
             border-radius: 5px;
             width: 0%;
         }
-        .custom-volume-control {
-            width: 100%;
-            margin-top: 10px;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 5px;
-            outline: none;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-        .custom-volume-control:hover {
-            opacity: 1;
-        }
-        .custom-volume-control::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 15px;
-            height: 15px;
-            background: #2563eb;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        .custom-volume-control::-moz-range-thumb {
-            width: 15px;
-            height: 15px;
-            background: #2563eb;
-            border-radius: 50%;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -244,7 +238,13 @@
     <div class="overlay"></div>
     <div class="music-container">
         <div class="music-player">
-            <img id="cover" src="https://via.placeholder.com/300x300" alt="Album Cover">
+            <div class="cover-and-volume">
+                <img id="cover" src="https://via.placeholder.com/300x300" alt="Album Cover">
+                <div class="volume-control vertical">
+                    <input type="range" min="0" max="1" step="0.01" value="1" class="custom-volume-control" id="custom-volume" onchange="setVolume(this.value)">
+                    <span id="volume-percent">100%</span>
+                </div>
+            </div>
             <div class="playlist" id="playlist">
                 <h3 class="text-lg font-bold mb-4">Playlist</h3>
                 <ul id="playlist-list"></ul>
@@ -259,10 +259,6 @@
             <div class="time-info flex justify-between text-sm mt-1">
                 <span id="current-time">0:00</span>
                 <span id="duration">0:00</span>
-            </div>
-            <div class="volume-control flex items-center gap-2 mt-3">
-                <input type="range" min="0" max="1" step="0.01" value="1" class="custom-volume-control" id="custom-volume" onchange="setVolume(this.value)">
-                <span id="volume-percent">100%</span>
             </div>
             <audio id="audio" style="display: none;">
                 <source id="audio-source" src="" type="audio/mp3">
@@ -283,7 +279,7 @@
                 </button>
                 <!-- دکمه نمایش/مخفی کردن لیست -->
                 <button id="toggle-playlist" class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition-colors">
-                    <i class="fas fa-list"></i> <!-- فقط آیکون -->
+                    <i class="fas fa-list"></i>
                 </button>
             </div>
         </div>
