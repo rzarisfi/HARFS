@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS Music Player V0.6.1</title>
+    <title>HARFS Music Player V0.7</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* استایل‌های صفحه لودینگ */
         #loading-page {
             position: fixed;
             top: 0;
@@ -43,28 +42,16 @@
             z-index: -1;
         }
 
-        /* افکت‌های جدید */
         @keyframes zoomIn {
-            0% {
-                transform: scale(1);
-                filter: blur(0);
-            }
-            100% {
-                transform: scale(1.2);
-                filter: blur(20px);
-            }
+            0% { transform: scale(1); filter: blur(0); }
+            100% { transform: scale(1.2); filter: blur(20px); }
         }
 
         @keyframes fadeOut {
-            0% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-            }
+            0% { opacity: 1; }
+            100% { opacity: 0; }
         }
 
-        /* بقیه استایل‌های شما */
         body {
             font-family: 'Arial', sans-serif;
             color: #fff;
@@ -76,6 +63,7 @@
             overflow: hidden;
             position: relative;
         }
+
         .background {
             position: absolute;
             top: 0;
@@ -87,6 +75,7 @@
             filter: blur(20px);
             z-index: -1;
         }
+
         .overlay {
             position: absolute;
             top: 0;
@@ -96,6 +85,7 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: -1;
         }
+
         .music-container {
             display: flex;
             flex-direction: column;
@@ -105,6 +95,7 @@
             z-index: 1;
             padding: 10px;
         }
+
         .music-player {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -115,6 +106,7 @@
             width: 100%;
             position: relative;
         }
+
         .cover-container {
             position: relative;
             width: 100%;
@@ -124,9 +116,11 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease-in-out;
         }
+
         .cover-container:hover {
             transform: scale(1.1);
         }
+
         .lyrics-overlay {
             position: absolute;
             top: 0;
@@ -140,6 +134,7 @@
             padding: 10px;
             box-sizing: border-box;
         }
+
         .lyrics-text {
             white-space: pre-line;
             line-height: 1.6;
@@ -147,6 +142,7 @@
             color: #fff;
             text-align: center;
         }
+
         .playlist {
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
@@ -164,15 +160,18 @@
             visibility: hidden;
             transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
         }
+
         .playlist.show {
             opacity: 1;
             visibility: visible;
         }
+
         .playlist ul {
             list-style: none;
             padding: 0;
             margin: 0;
         }
+
         .playlist li {
             padding: 10px;
             cursor: pointer;
@@ -180,12 +179,15 @@
             margin-bottom: 5px;
             transition: background 0.3s;
         }
+
         .playlist li:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+
         .playlist li.active {
             background: #2563eb;
         }
+
         .controls button {
             margin: 0 5px;
             padding: 10px 15px;
@@ -196,15 +198,19 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
+
         .controls button:hover {
             transform: scale(1.1);
         }
+
         .controls button:active {
             transform: scale(0.9);
         }
+
         .track-info {
             margin-bottom: 20px;
         }
+
         .custom-progress-bar {
             width: 100%;
             height: 5px;
@@ -214,12 +220,14 @@
             cursor: pointer;
             position: relative;
         }
+
         .custom-progress {
             height: 100%;
             background: #2563eb;
             border-radius: 5px;
             width: 0%;
         }
+
         .folder {
             cursor: pointer;
             padding: 10px;
@@ -228,32 +236,34 @@
             margin-bottom: 5px;
             transition: background 0.3s;
         }
+
         .folder:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+
         .folder-tracks {
             padding-left: 20px;
             margin-top: 5px;
         }
+
         .folder-tracks li {
             padding: 5px;
             cursor: pointer;
             border-radius: 5px;
             transition: background 0.3s;
         }
+
         .folder-tracks li:hover {
             background: rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 <body>
-    <!-- صفحه لودینگ -->
     <div id="loading-page">
         <div class="loading-background" id="loading-background"></div>
         <div class="loading-overlay"></div>
     </div>
 
-    <!-- بقیه کدهای شما -->
     <div class="background" id="background"></div>
     <div class="overlay"></div>
     <div class="music-container">
@@ -296,12 +306,13 @@
                 <button onclick="nextTrack()">
                     <i class="fas fa-forward"></i>
                 </button>
-                <!-- دکمه نمایش/مخفی کردن لیست -->
-                <button id="toggle-playlist" class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition-colors">
+                <button onclick="downloadTrack()">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button id="toggle-playlist">
                     <i class="fas fa-list"></i>
                 </button>
-                <!-- دکمه نمایش/مخفی کردن lyrics -->
-                <button id="toggle-lyrics" class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition-colors">
+                <button id="toggle-lyrics">
                     <i class="fas fa-align-left"></i>
                 </button>
             </div>
@@ -340,14 +351,13 @@
         const loadingPage = document.getElementById("loading-page");
         const loadingBackground = document.getElementById("loading-background");
 
-        // تابع برای نمایش صفحه لودینگ و تنظیم عکس کاور اولیه
         async function showLoadingPage(imageUrl) {
             const img = new Image();
             img.src = imageUrl;
             img.onload = () => {
                 loadingBackground.style.backgroundImage = `url(${imageUrl})`;
                 background.style.backgroundImage = `url(${imageUrl})`;
-                cover.src = imageUrl; // تنظیم عکس کاور اولیه به عکس لودینگ
+                cover.src = imageUrl;
                 loadingPage.style.display = "flex";
 
                 setTimeout(() => {
@@ -363,51 +373,50 @@
             };
         }
 
-        // فراخوانی تابع نمایش صفحه لودینگ با عکس مورد نظر
         const loadingImageUrl = "https://raw.githubusercontent.com/rzarisfi/HarfsMusic/main/loading-image.jpg";
         showLoadingPage(loadingImageUrl);
 
-        // تابع برای تبدیل زمان به فرمت دقیقه:ثانیه
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60);
             return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
         }
 
-        // به‌روزرسانی زمان موزیک و نوار پیشرفت
         audio.addEventListener("timeupdate", () => {
             const progressPercent = (audio.currentTime / audio.duration) * 100;
             customProgress.style.width = `${progressPercent}%`;
-
-            // نمایش زمان فعلی و کل زمان
             currentTimeElement.textContent = formatTime(audio.currentTime);
             durationElement.textContent = formatTime(audio.duration);
         });
 
-        // تابع برای دریافت و نمایش متن آهنگ (lyrics)
-        async function fetchLyrics(trackTitle) {
+        async function fetchLyrics(trackTitle, folderPath = "") {
             try {
-                const response = await fetch(`https://raw.githubusercontent.com/${githubRepo}/${githubFolder}/${trackTitle}.txt`);
-                if (!response.ok) {
-                    throw new Error("Lyrics not found");
-                }
+                const encodedTitle = encodeURIComponent(trackTitle);
+                const lyricsPath = folderPath ? 
+                    `${folderPath}/${encodedTitle}` : 
+                    encodedTitle;
+
+                const response = await fetch(
+                    `https://raw.githubusercontent.com/${githubRepo}/${githubFolder}/${lyricsPath}.txt`
+                );
+                
+                if (!response.ok) throw new Error("Lyrics not found");
+                
                 const lyrics = await response.text();
                 document.getElementById("lyrics").textContent = lyrics;
             } catch (error) {
+                console.error("Error fetching lyrics:", error);
                 document.getElementById("lyrics").textContent = "Lyrics not available.";
             }
         }
 
-        // تابع برای دریافت پوشه‌ها و آهنگ‌ها از GitHub
         async function fetchTracks() {
             try {
                 const response = await fetch(`https://api.github.com/repos/${githubRepo}/contents?ref=${githubFolder}`);
                 const data = await response.json();
 
-                // فیلتر کردن پوشه‌ها
                 const foldersData = data.filter(item => item.type === "dir");
 
-                // دریافت آهنگ‌های داخل هر پوشه
                 for (const folder of foldersData) {
                     const folderResponse = await fetch(folder.url);
                     const folderData = await folderResponse.json();
@@ -427,7 +436,6 @@
                     });
                 }
 
-                // دریافت آهنگ‌های داخل پوشه اصلی
                 const rootTracks = data
                     .filter(file => file.type === "file" && file.name.endsWith(".mp3"))
                     .map(file => ({
@@ -450,7 +458,6 @@
             }
         }
 
-        // تابع برای رندر کردن لیست پخش
         function renderPlaylist() {
             playlistList.innerHTML = folders
                 .map((folder, folderIndex) => 
@@ -473,7 +480,6 @@
                 .join("");
         }
 
-        // تابع برای باز و بسته کردن پوشه‌ها
         function toggleFolder(element) {
             const folderTracks = element.nextElementSibling;
             if (folderTracks.style.display === "none") {
@@ -485,7 +491,6 @@
             }
         }
 
-        // تابع برای پخش آهنگ
         function playTrack(trackIndex, folderIndex) {
             currentTrackIndex = trackIndex;
             currentFolderIndex = folderIndex;
@@ -496,8 +501,6 @@
             audio.load();
             audio.play();
 
-            console.log("Playing track:", track.source); // بررسی URL فایل صوتی
-
             const img = new Image();
             img.src = track.cover;
             img.onload = () => {
@@ -507,20 +510,20 @@
                 cover.src = "https://via.placeholder.com/300x300";
             };
 
-            fetchLyrics(track.title);
+            const folderName = folders[folderIndex].name !== "Root" ? 
+                folders[folderIndex].name : 
+                "";
+            fetchLyrics(track.title, folderName);
 
-            // مخفی کردن پلی‌لیست پس از انتخاب آهنگ
             playlistElement.classList.remove("show");
         }
 
-        // تابع برای پخش آهنگ قبلی
         function prevTrack() {
             const folder = folders[currentFolderIndex];
             currentTrackIndex = (currentTrackIndex - 1 + folder.tracks.length) % folder.tracks.length;
             playTrack(currentTrackIndex, currentFolderIndex);
         }
 
-        // تابع برای پخش آهنگ بعدی
         function nextTrack() {
             const folder = folders[currentFolderIndex];
             if (isShuffle) {
@@ -531,7 +534,6 @@
             playTrack(currentTrackIndex, currentFolderIndex);
         }
 
-        // تابع برای توقف یا ادامه پخش
         function togglePlayPause() {
             if (audio.paused) {
                 audio.play();
@@ -542,7 +544,6 @@
             }
         }
 
-        // تابع برای تغییر حالت shuffle/repeat
         function toggleShuffleRepeat() {
             if (!isShuffle && !isRepeatAll && !isRepeatOne) {
                 isShuffle = true;
@@ -568,7 +569,6 @@
             audio.loop = isRepeatOne;
         }
 
-        // تابع برای جستجوی زمان در آهنگ
         function seek(event) {
             const progressBar = event.currentTarget;
             const clickPosition = event.offsetX;
@@ -577,7 +577,6 @@
             audio.currentTime = seekTime;
         }
 
-        // رویداد پایان آهنگ
         audio.addEventListener("ended", () => {
             if (isRepeatOne) {
                 audio.currentTime = 0;
@@ -589,17 +588,26 @@
             }
         });
 
-        // نمایش/مخفی کردن لیست آهنگ‌ها
         togglePlaylistButton.addEventListener("click", () => {
             playlistElement.classList.toggle("show");
         });
 
-        // نمایش/مخفی کردن lyrics
         toggleLyricsButton.addEventListener("click", () => {
             lyricsOverlay.style.display = lyricsOverlay.style.display === "none" ? "block" : "none";
         });
 
-        // بارگذاری اولیه آهنگ‌ها
+        function downloadTrack() {
+            const currentTrack = folders[currentFolderIndex]?.tracks[currentTrackIndex];
+            if (currentTrack) {
+                const link = document.createElement('a');
+                link.href = currentTrack.source;
+                link.download = `${currentTrack.title}.mp3`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
         fetchTracks();
     </script>
 </body>
