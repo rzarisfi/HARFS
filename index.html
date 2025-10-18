@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS Music Player V2.1 - Forced Splash Removal</title>
+    <title>HARFS Music Player V2.2 - Responsive & Dynamic</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -28,8 +28,18 @@
             overflow: hidden;
             position: relative;
             background: #1a1a1a;
+            direction: ltr; /* Set LTR as base for technical components */
         }
-
+        
+        /* Text Direction Correction for Persian Text */
+        .track-info, .lyrics-text, .playlist-container {
+            direction: rtl;
+            text-align: right;
+        }
+        .track-info #artist, .track-info #title {
+             text-align: center; /* Center on mobile/default */
+        }
+        
         /* Dynamic Background & Overlay - Always a full-screen blur of the cover */
         .background {
             position: absolute;
@@ -39,8 +49,8 @@
             height: 100%;
             background-size: cover;
             background-position: center;
-            filter: blur(50px) brightness(0.7); /* Increased blur for deep background */
-            transition: background-image 1.5s ease-in-out; /* Smooth transition */
+            filter: blur(50px) brightness(0.7);
+            transition: background-image 1.5s ease-in-out;
             z-index: -2;
             transform: scale(1.1);
         }
@@ -82,16 +92,54 @@
             overflow: hidden;
             transition: transform 0.4s ease-in-out;
         }
-        
-        #cover { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
-        .track-info #title { font-size: 1.5rem; font-weight: 700; margin: 0; color: var(--secondary-color); }
-        .track-info #artist { font-size: 1rem; color: rgba(255, 255, 255, 0.8); }
-        .custom-progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.2); border-radius: 4px; margin: 15px 0; cursor: pointer; position: relative; }
-        .custom-progress { height: 100%; background: var(--primary-color); border-radius: 4px; width: 0%; transition: width 0.1s linear; }
-        .controls button { background-color: var(--primary-color); color: #fff; width: 50px; height: 50px; border-radius: 50%; transition: transform 0.2s; }
-        .controls #play-pause { width: 65px; height: 65px; font-size: 1.5rem; margin: 0 20px; background-color: #a855f7; }
 
-        /* Playlist Panel Styles */
+        /* Lyrics Overlay (kept standard) */
+        .lyrics-overlay {
+            background: var(--dark-overlay);
+            border-radius: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .lyrics-overlay.show { display: flex; align-items: center; justify-content: center; opacity: 1; }
+        .lyrics-text { padding: 20px; max-height: 100%; overflow-y: auto; white-space: pre-line; line-height: 1.8; font-size: 0.9rem; text-align: center; color: rgba(255, 255, 255, 0.9); }
+
+        /* Controls */
+        .controls button {
+            background-color: var(--primary-color);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        .controls #play-pause {
+            width: 65px;
+            height: 65px;
+            font-size: 1.5rem;
+            margin: 0 20px;
+            background-color: #a855f7;
+        }
+
+        /* Utility Controls (Mobile Spacing Fix) */
+        .utility-controls {
+            justify-content: space-between;
+            width: 90%; 
+            max-width: 300px;
+            margin: 24px auto 0 auto; 
+        }
+        
+        .utility-controls > button {
+             margin: 0 !important; 
+        }
+
+        /* Playlist Panel (Kept standard size and position) */
         .playlist-container {
             background: var(--dark-overlay);
             backdrop-filter: blur(10px);
@@ -112,34 +160,24 @@
             opacity: 1;
         }
 
-        /* Lyrics Overlay */
-        .lyrics-overlay {
-            background: var(--dark-overlay);
-            border-radius: 20px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        .lyrics-overlay.show { display: flex; align-items: center; justify-content: center; opacity: 1; }
-        .lyrics-text { padding: 20px; max-height: 100%; overflow-y: auto; white-space: pre-line; line-height: 1.8; font-size: 0.9rem; text-align: center; color: rgba(255, 255, 255, 0.9); }
-
-
         /* --- Media Query for Landscape (Tablet/Desktop) --- */
         @media (min-width: 768px) and (min-aspect-ratio: 1/1) {
-            body { padding: 40px; }
+
+            body {
+                padding: 40px;
+            }
+            .track-info #artist, .track-info #title {
+                 text-align: right; /* Align to right on desktop/rtl */
+            }
+
             .music-player-card {
                 flex-direction: row;
                 max-width: 850px;
                 padding: 40px;
-                text-align: left;
+                text-align: right; /* Align text content right */
                 gap: 40px;
             }
+
             .cover-container {
                 width: 280px;
                 min-width: 280px;
@@ -147,29 +185,59 @@
                 padding-top: 0;
                 margin-bottom: 0;
             }
+
             .track-controls-area {
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
                 width: 100%;
             }
-            .track-info { margin-bottom: 25px; }
-            .controls, .utility-controls { justify-content: flex-start; }
-            .controls { margin-top: 20px; }
-            .utility-controls { margin-top: 20px; justify-content: space-between; }
-            .utility-controls > button { margin: 0 10px 0 0; }
-            .playlist-container { right: 40px; }
+
+            .track-info {
+                margin-bottom: 25px;
+            }
+
+            /* Adjust controls alignment for horizontal layout */
+            .controls, .utility-controls {
+                justify-content: flex-start;
+                width: auto;
+                max-width: none;
+            }
+
+            .utility-controls > button {
+                margin-right: 15px !important;
+            }
+            
+            .controls {
+                margin-top: 20px;
+            }
+
+            .utility-controls {
+                margin-top: 20px;
+                justify-content: flex-start;
+                margin-left: 0;
+            }
+
+            .playlist-container {
+                right: 40px;
+            }
         }
-        
+
+        /* Other standard styles */
+        #cover { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
+        .track-info #title { font-size: 1.5rem; font-weight: 700; margin: 0; color: var(--secondary-color); }
+        .track-info #artist { font-size: 1rem; color: rgba(255, 255, 255, 0.8); }
+        .custom-progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.2); border-radius: 4px; margin: 15px 0; cursor: pointer; position: relative; }
+        .custom-progress { height: 100%; background: var(--primary-color); border-radius: 4px; width: 0%; transition: width 0.1s linear; }
+
         /* Loading Page - Forced Removal */
-        #loading-page { 
+        #loading-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 2000; background: rgba(0, 0, 0, 0.9);
-            /* Ensure it starts visible */
-            opacity: 1; 
+            opacity: 1;
             visibility: visible;
-            transition: opacity 1s ease-in-out, visibility 1s; /* Add transition for smooth hide */
+            transition: opacity 1s ease-in-out, visibility 1s;
         }
-        
+
         #loading-page.hidden-forced {
             opacity: 0;
             visibility: hidden;
@@ -178,14 +246,13 @@
         .loading-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: -1; animation: zoomIn 5s ease-in-out forwards; }
         .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: -1; }
         @keyframes zoomIn { 0% { transform: scale(1); filter: blur(0); } 100% { transform: scale(1.2); filter: blur(20px); } }
-        /* Removed fadeOut keyframes as we use the JS class for hiding */
     </style>
 </head>
 <body>
     <div id="loading-page">
         <div class="loading-background" id="loading-background"></div>
         <div class="loading-overlay"></div>
-        <div class="text-white text-2xl font-bold tracking-widest animate-pulse">HARFS MUSIC</div>
+        <div class="text-white text-2xl font-bold tracking-widest animate-pulse" style="direction: ltr;">HARFS MUSIC</div>
     </div>
 
     <div class="background" id="background"></div>
@@ -206,7 +273,7 @@
                 <p id="artist" class="text-purple-300 text-base font-medium">Please wait</p>
             </div>
 
-            <div>
+            <div style="direction: ltr;">
                 <div class="custom-progress-bar" onclick="seek(event)">
                     <div class="custom-progress" id="custom-progress"></div>
                 </div>
@@ -216,7 +283,7 @@
                 </div>
             </div>
 
-            <div class="controls flex justify-center items-center mt-8">
+            <div class="controls flex justify-center items-center mt-8" style="direction: ltr;">
                 <button onclick="prevTrack()" class="focus:outline-none">
                     <i class="fas fa-backward"></i>
                 </button>
@@ -228,7 +295,7 @@
                 </button>
             </div>
 
-            <div class="utility-controls flex justify-center items-center mt-6">
+            <div class="utility-controls flex items-center mt-6" style="direction: ltr;">
                 <button id="shuffle-repeat" onclick="toggleShuffleRepeat()" title="Shuffle/Repeat Mode" class="focus:outline-none">
                     <i class="fas fa-music"></i>
                 </button>
@@ -290,12 +357,8 @@
         const loadingBackground = document.getElementById("loading-background");
         const loadingImageUrl = "https://raw.githubusercontent.com/rzarisfi/HarfsMusic/main/loading-image.jpg";
         
-        // --- NEW: Function to forcefully hide the loading page ---
         function forceHideLoadingPage() {
-            // Use a class and CSS transition for smooth fade out
             loadingPage.classList.add("hidden-forced");
-            
-            // Fully remove the element after transition ends (1 second)
             setTimeout(() => {
                 loadingPage.style.display = "none";
             }, 1000);
@@ -316,7 +379,7 @@
                 console.error("Error loading loading page image. Using fallback.");
             };
             
-            // *** CORE CHANGE: Set a fixed timeout for 4 seconds ***
+            // CORE CHANGE: Set a fixed timeout for 4 seconds
             const SPLASH_DURATION_MS = 4000; 
             setTimeout(forceHideLoadingPage, SPLASH_DURATION_MS);
         }
