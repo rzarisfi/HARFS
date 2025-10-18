@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS Music Player V3.1 - Search Fix</title>
+    <title>HARFS Music Player V3.2 - Final Fixes</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow-x: hidden; /* Prevent horizontal scroll due to overflow */
+            overflow-x: hidden;
             position: relative;
             background: #1a1a1a;
             direction: ltr; 
@@ -37,11 +37,11 @@
             text-align: right;
         }
         .track-info #artist, .track-info #title {
-             text-align: center; /* Center on mobile/default */
-             width: 100%; /* Ensure full width */
-             overflow: hidden; /* Hide overflowing text */
-             white-space: nowrap; /* Keep text on single line */
-             text-overflow: ellipsis; /* Add ellipsis (...) for long names */
+             text-align: center; 
+             width: 100%; 
+             overflow: hidden; 
+             white-space: nowrap; 
+             text-overflow: ellipsis; 
         }
         
         /* Dynamic Background & Overlay */
@@ -58,7 +58,7 @@
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
             border-radius: 30px;
-            padding: 20px; /* Reduced padding for mobile */
+            padding: 20px; 
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 360px; 
@@ -75,7 +75,7 @@
         .track-info #artist { font-size: 1rem; color: rgba(255, 255, 255, 0.8); }
         
         /* Progress Bar & Time Fixes */
-        .progress-time-area { width: 100%; padding: 0 10px; box-sizing: border-box; } /* Ensure padding doesn't break width */
+        .progress-time-area { width: 100%; padding: 0 10px; box-sizing: border-box; } 
         .custom-progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.2); border-radius: 4px; margin: 15px 0; cursor: pointer; position: relative; }
         .custom-progress { height: 100%; background: var(--primary-color); border-radius: 4px; width: 0%; transition: width 0.1s linear; }
 
@@ -92,10 +92,41 @@
         #volume-slider { background: var(--primary-color); height: 8px; border-radius: 4px; margin: 0 10px; cursor: pointer; }
 
         /* Playlist Panel & Search */
-        .playlist-container { background: var(--dark-overlay); backdrop-filter: blur(10px); border-radius: 15px; width: 300px; max-height: 450px; position: fixed; top: 50%; right: 20px; transform: translateY(-50%) translateX(150%); transition: transform 0.4s ease-out, opacity 0.4s ease-out; z-index: 10; opacity: 0; padding: 20px; }
-        .playlist-container.show { transform: translateY(-50%) translateX(0); opacity: 1; }
-        #search-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--secondary-color); color: white; padding: 8px 15px; border-radius: 8px; margin-bottom: 15px; }
-        .folder-tracks li.active { background-color: var(--primary-color); color: white; font-weight: bold; padding: 5px 10px; border-radius: 5px;}
+        .playlist-container { 
+            background: var(--dark-overlay); 
+            backdrop-filter: blur(10px); 
+            border-radius: 15px; 
+            width: 300px; 
+            max-height: 450px; 
+            position: fixed; 
+            top: 50%; 
+            right: 20px; 
+            transform: translateY(-50%) translateX(150%); 
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out; 
+            z-index: 10; 
+            opacity: 0; 
+            padding: 20px; 
+        }
+        .playlist-container.show { 
+            transform: translateY(-50%) translateX(0); 
+            opacity: 1; 
+        }
+        #search-input { 
+            width: 100%; 
+            background: rgba(255, 255, 255, 0.1); 
+            border: 1px solid var(--secondary-color); 
+            color: white; 
+            padding: 8px 15px; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+        }
+        .folder-tracks li.active { 
+            background-color: var(--primary-color); 
+            color: white; 
+            font-weight: bold; 
+            padding: 5px 10px; 
+            border-radius: 5px;
+        }
         
         /* --- Media Query for Landscape (Tablet/Desktop) --- */
         @media (min-width: 768px) and (min-aspect-ratio: 1/1) {
@@ -119,9 +150,18 @@
         }
 
         /* Loading Page */
-        #loading-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 2000; background: rgba(0, 0, 0, 0.9); opacity: 1; visibility: visible; transition: opacity 1s ease-in-out, visibility 1s; }
+        #loading-page { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 2000; background: rgba(0, 0, 0, 0.9); opacity: 1; visibility: visible; 
+            transition: opacity 1s ease-in-out, visibility 1s; 
+        }
         #loading-page.hidden-forced { opacity: 0; visibility: hidden; }
-        .loading-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: -1; animation: zoomIn 5s ease-in-out forwards; }
+        .loading-background { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; background-position: center; z-index: -1; 
+            animation: zoomIn 5s ease-in-out forwards; 
+        }
         .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: -1; }
         @keyframes zoomIn { 0% { transform: scale(1); filter: blur(0); } 100% { transform: scale(1.2); filter: blur(20px); } }
     </style>
@@ -217,7 +257,7 @@
 
         let folders = [];
         let allTracks = []; // Flat list of all tracks for searching
-        let activeTracks = []; // NEW: لیست آهنگ‌هایی که در حال حاضر نمایش داده می‌شوند (فیلتر شده یا اصلی)
+        let activeTracks = []; // لیست آهنگ‌هایی که در حال حاضر نمایش داده می‌شوند (فیلتر شده یا اصلی)
         let currentTrackIndex = 0;
         let currentFolderIndex = 0;
         let isShuffle = false;
@@ -454,7 +494,7 @@
         }
         
         function toggleFolder(element, folderIndex, isSearchMode) {
-            if (isSearchMode) return; // در حالت جستجو، پوشه‌ها همیشه باز هستند.
+            if (isSearchMode) return; 
             
             const icon = element.querySelector("i");
             const folderTracks = document.getElementById(`folder-${folderIndex}-tracks`);
@@ -466,6 +506,10 @@
                 folderTracks.style.display = "none";
                 icon.classList.replace("fa-folder-open", "fa-folder");
             }
+        }
+        
+        function hidePlaylist() { // NEW Utility Function
+            playlistContainer.classList.remove("show");
         }
 
         // --- Player Controls ---
@@ -479,14 +523,15 @@
             const track = folders[folderIndex].tracks[trackIndex];
             
             playFromActiveList(activeTracks.findIndex(t => t.title === track.title && t.artist === track.artist));
+            hidePlaylist(); // بستن لیست پخش
         }
 
-        function playFromActiveList(activeIndex) { // NEW Play Function for Search Results
+        function playFromActiveList(activeIndex) { 
             if (!activeTracks[activeIndex]) return;
 
             const track = activeTracks[activeIndex];
             
-            // یافتن ایندکس اصلی آهنگ در آرایه folders برای به‌روزرسانی currentTrackIndex/FolderIndex
+            // یافتن ایندکس اصلی آهنگ در آرایه folders
             let foundOriginal = false;
             for(let fIndex = 0; fIndex < folders.length; fIndex++) {
                 const tIndex = folders[fIndex].tracks.findIndex(t => t.title === track.title && t.artist === track.artist);
@@ -512,7 +557,9 @@
 
             const trackPath = folders[currentFolderIndex] ? folders[currentFolderIndex].path : "";
             fetchLyrics(track.title, trackPath);
-            updateActiveTrackInPlaylist(activeIndex); // به‌روزرسانی نمایش آهنگ فعال
+            updateActiveTrackInPlaylist(activeIndex); 
+            
+            hidePlaylist(); // بستن لیست پخش
         }
 
 
@@ -614,13 +661,10 @@
             let selector;
             
             if (searchInput.value.trim() !== "") {
-                // حالت جستجو: از activeIndex استفاده می‌کنیم
-                // activeIndex را اگر از playFromActiveList آمده باشد یا در لیست فعال پیدا شود، استفاده می‌کنیم.
                 const searchActiveIndex = activeIndex !== undefined ? activeIndex : activeTracks.findIndex(t => t.title === folders[currentFolderIndex].tracks[currentTrackIndex].title && t.artist === folders[currentFolderIndex].tracks[currentTrackIndex].artist);
                 selector = `.folder-tracks li[data-folder-index="active"][data-track-index="${searchActiveIndex}"]`;
                 
             } else {
-                // حالت عادی: از ایندکس اصلی استفاده می‌کنیم
                 selector = `.folder-tracks li[data-folder-index="${currentFolderIndex}"][data-track-index="${currentTrackIndex}"]`;
             }
             
@@ -676,6 +720,7 @@
             }
         });
 
+        // تغییر دکمه لیست پخش برای استفاده از تابع قبلی
         togglePlaylistButton.addEventListener("click", () => {
             playlistContainer.classList.toggle("show");
         });
