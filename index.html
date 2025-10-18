@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS Music Player V1.0 - Modern UI</title>
+    <title>HARFS Music Player V2.0 - Responsive & Dynamic</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Base Styles & Glassmorphism */
+        /* Base Styles & Glassmorphism Variables */
         :root {
             --primary-color: #5b21b6; /* Purple-700 */
             --secondary-color: #c4b5fd; /* Purple-300 */
@@ -27,10 +27,10 @@
             padding: 20px;
             overflow: hidden;
             position: relative;
-            background: #1a1a1a; /* Fallback dark background */
+            background: #1a1a1a;
         }
 
-        /* Animated Background & Overlay */
+        /* Dynamic Background & Overlay - Always a full-screen blur of the cover */
         .background {
             position: absolute;
             top: 0;
@@ -39,10 +39,10 @@
             height: 100%;
             background-size: cover;
             background-position: center;
-            filter: blur(40px) brightness(0.6); /* Increased blur and dimness for better text contrast */
-            transition: background-image 1s ease-in-out;
+            filter: blur(50px) brightness(0.7); /* Increased blur for deep background */
+            transition: background-image 1.5s ease-in-out; /* Smooth transition */
             z-index: -2;
-            transform: scale(1.1); /* Slight zoom for better blurred effect */
+            transform: scale(1.1);
         }
 
         .overlay {
@@ -55,206 +55,35 @@
             z-index: -1;
         }
 
-        /* Main Container for the Music Player */
+        /* --- Player Card Base Style (Optimized for Mobile/Portrait) --- */
         .music-player-card {
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
             border-radius: 30px;
-            padding: 40px;
+            padding: 30px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            width: 90%;
-            max-width: 400px; /* Slimmer profile */
+            width: 100%;
+            max-width: 360px; /* Mobile width */
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.18); /* Light border for glass effect */
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
 
         /* Cover Image Styling */
         .cover-container {
-            width: 100%;
-            padding-top: 100%; /* Aspect ratio 1:1 */
+            width: 90%;
+            padding-top: 90%; /* 1:1 Aspect Ratio on Mobile */
             position: relative;
             border-radius: 20px;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             overflow: hidden;
             transition: transform 0.4s ease-in-out;
         }
 
-        .cover-container:hover {
-            transform: translateY(-5px);
-        }
-
-        #cover {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 20px;
-        }
-
-        /* Track Info */
-        .track-info {
-            margin-bottom: 25px;
-        }
-
-        #title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-            color: var(--secondary-color);
-        }
-
-        #artist {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* Custom Progress Bar */
-        .custom-progress-bar {
-            width: 100%;
-            height: 8px; /* Thicker bar */
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            margin: 15px 0;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .custom-progress {
-            height: 100%;
-            background: var(--primary-color);
-            border-radius: 4px;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
-
-        /* Controls */
-        .controls button {
-            background-color: var(--primary-color);
-            color: #fff;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .controls button:hover {
-            background-color: #6d28d9; /* Purple-800 */
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .controls #play-pause {
-            width: 65px;
-            height: 65px;
-            font-size: 1.5rem;
-            margin: 0 20px;
-            background-color: #a855f7; /* Purple-500 for emphasis */
-        }
-
-        .controls #play-pause:hover {
-            background-color: #9333ea; /* Purple-600 */
-        }
-
-        /* Utility Controls (Shuffle, Download, etc.) */
-        .utility-controls button {
-            background: none;
-            color: var(--secondary-color);
-            width: 40px;
-            height: 40px;
-            margin: 0 5px;
-            opacity: 0.7;
-            transition: opacity 0.2s, color 0.2s;
-        }
-
-        .utility-controls button:hover {
-            opacity: 1;
-            color: #fff;
-        }
-        
-        /* Playlist Styling */
-        .playlist-container {
-            background: var(--dark-overlay);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.7);
-            width: 300px;
-            max-height: 450px;
-            position: absolute;
-            top: 50%;
-            right: 20px; /* Positioned to the right */
-            transform: translateY(-50%) translateX(150%); /* Start off-screen */
-            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-            z-index: 10;
-            overflow-y: hidden;
-            opacity: 0;
-        }
-
-        .playlist-container.show {
-            transform: translateY(-50%) translateX(0);
-            opacity: 1;
-        }
-
-        .playlist ul {
-            max-height: 380px;
-            overflow-y: auto;
-        }
-
-        .playlist li {
-            padding: 8px 10px;
-            cursor: pointer;
-            border-radius: 8px;
-            margin-bottom: 3px;
-            transition: background 0.2s;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .playlist li:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .playlist li.active, .playlist li.active > .folder {
-            background: var(--primary-color) !important;
-            color: #fff;
-            font-weight: 600;
-        }
-
-        /* Folder Specific Styling */
-        .folder {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            margin-bottom: 5px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-weight: 600;
-            color: var(--secondary-color);
-        }
-
-        .folder:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .folder-tracks {
-            padding-left: 0; /* Remove default padding for better alignment */
-            list-style: none;
-            margin-top: 5px;
-        }
-
-        /* Lyrics Overlay */
+        /* Lyrics Overlay (kept standard) */
         .lyrics-overlay {
             background: var(--dark-overlay);
             border-radius: 20px;
@@ -263,36 +92,122 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 5; /* Above cover, below main controls */
+            z-index: 5;
             display: none;
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
         }
+        .lyrics-overlay.show { display: flex; align-items: center; justify-content: center; opacity: 1; }
+        .lyrics-text { padding: 20px; max-height: 100%; overflow-y: auto; white-space: pre-line; line-height: 1.8; font-size: 0.9rem; text-align: center; color: rgba(255, 255, 255, 0.9); }
 
-        .lyrics-overlay.show {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Controls (Kept standard size for mobile) */
+        .controls button {
+            background-color: var(--primary-color);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        .controls #play-pause {
+            width: 65px;
+            height: 65px;
+            font-size: 1.5rem;
+            margin: 0 20px;
+            background-color: #a855f7;
+        }
+
+        /* Playlist Panel (Kept standard size and position) */
+        .playlist-container {
+            background: var(--dark-overlay);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            width: 300px;
+            max-height: 450px;
+            position: fixed; /* Fixed position for responsiveness */
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%) translateX(150%);
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+            z-index: 10;
+            opacity: 0;
+            padding: 20px;
+        }
+        .playlist-container.show {
+            transform: translateY(-50%) translateX(0);
             opacity: 1;
         }
 
-        .lyrics-text {
-            padding: 20px;
-            max-height: 100%;
-            overflow-y: auto;
-            white-space: pre-line;
-            line-height: 1.8;
-            font-size: 1rem;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.9);
-        }
+        /* --- Media Query for Landscape (Tablet/Desktop) --- */
+        @media (min-width: 768px) and (min-aspect-ratio: 1/1) {
+            
+            body {
+                padding: 40px;
+            }
 
-        /* Loading Page - Keep original functionality */
-        #loading-page {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 2000; background: rgba(0, 0, 0, 0.9);
+            .music-player-card {
+                /* Change layout to horizontal flex for desktop/landscape */
+                flex-direction: row;
+                max-width: 850px; /* Wide desktop card */
+                padding: 40px;
+                text-align: left;
+                gap: 40px;
+            }
+
+            .cover-container {
+                /* Cover takes fixed size on desktop */
+                width: 280px;
+                min-width: 280px;
+                height: 280px;
+                padding-top: 0; 
+                margin-bottom: 0;
+            }
+
+            .track-controls-area {
+                /* Right side content wrapper */
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .track-info {
+                margin-bottom: 25px;
+            }
+
+            /* Adjust controls alignment for horizontal layout */
+            .controls, .utility-controls {
+                justify-content: flex-start; /* Align controls to the left */
+            }
+
+            .controls {
+                margin-top: 20px;
+            }
+            
+            .utility-controls {
+                margin-top: 20px;
+                justify-content: space-between;
+            }
+            
+            .utility-controls > button {
+                margin: 0 10px 0 0;
+            }
+
+            /* Move playlist closer to the edge */
+            .playlist-container {
+                right: 40px;
+            }
         }
+        
+        /* Keep other styles (progress bar, track-info, etc.) */
+        #cover { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
+        .track-info #title { font-size: 1.5rem; font-weight: 700; margin: 0; color: var(--secondary-color); }
+        .track-info #artist { font-size: 1rem; color: rgba(255, 255, 255, 0.8); }
+        .custom-progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.2); border-radius: 4px; margin: 15px 0; cursor: pointer; position: relative; }
+        .custom-progress { height: 100%; background: var(--primary-color); border-radius: 4px; width: 0%; transition: width 0.1s linear; }
+        /* Loading Page - Keep original functionality */
+        #loading-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 2000; background: rgba(0, 0, 0, 0.9); }
         .loading-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: -1; animation: zoomIn 5s ease-in-out forwards; }
-        .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: -1; }
         @keyframes zoomIn { 0% { transform: scale(1); filter: blur(0); } 100% { transform: scale(1.2); filter: blur(20px); } }
         @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; } }
     </style>
@@ -315,35 +230,39 @@
             </div>
         </div>
 
-        <div class="track-info">
-            <h2 id="title" class="text-white text-2xl font-extrabold truncate">Loading...</h2>
-            <p id="artist" class="text-purple-300 text-base font-medium">Please wait</p>
-        </div>
+        <div class="track-controls-area">
+            
+            <div class="track-info">
+                <h2 id="title" class="text-white text-2xl font-extrabold truncate">Loading...</h2>
+                <p id="artist" class="text-purple-300 text-base font-medium">Please wait</p>
+            </div>
 
-        <div class="custom-progress-bar" onclick="seek(event)">
-            <div class="custom-progress" id="custom-progress"></div>
-        </div>
-        <div class="time-info flex justify-between w-full text-sm text-gray-300 font-medium">
-            <span id="current-time">0:00</span>
-            <span id="duration">0:00</span>
-        </div>
+            <div>
+                <div class="custom-progress-bar" onclick="seek(event)">
+                    <div class="custom-progress" id="custom-progress"></div>
+                </div>
+                <div class="time-info flex justify-between w-full text-sm text-gray-300 font-medium">
+                    <span id="current-time">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
 
-        <div class="controls flex justify-center items-center mt-8">
-            <button onclick="prevTrack()" class="focus:outline-none">
-                <i class="fas fa-backward"></i>
-            </button>
-            <button onclick="togglePlayPause()" id="play-pause" class="focus:outline-none">
-                <i class="fas fa-play"></i>
-            </button>
-            <button onclick="nextTrack()" class="focus:outline-none">
-                <i class="fas fa-forward"></i>
-            </button>
-        </div>
+            <div class="controls flex justify-center items-center mt-8">
+                <button onclick="prevTrack()" class="focus:outline-none">
+                    <i class="fas fa-backward"></i>
+                </button>
+                <button onclick="togglePlayPause()" id="play-pause" class="focus:outline-none">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button onclick="nextTrack()" class="focus:outline-none">
+                    <i class="fas fa-forward"></i>
+                </button>
+            </div>
 
-        <div class="utility-controls flex justify-between w-full mt-6">
-            <button id="shuffle-repeat" onclick="toggleShuffleRepeat()" title="Shuffle/Repeat Mode" class="focus:outline-none">
-                <i class="fas fa-music"></i> </button>
-            <div class="flex">
+            <div class="utility-controls flex justify-center items-center mt-6">
+                <button id="shuffle-repeat" onclick="toggleShuffleRepeat()" title="Shuffle/Repeat Mode" class="focus:outline-none">
+                    <i class="fas fa-music"></i>
+                </button>
                 <button id="toggle-lyrics" title="Toggle Lyrics" class="focus:outline-none">
                     <i class="fas fa-align-left"></i>
                 </button>
@@ -368,7 +287,7 @@
     </div>
 
     <script>
-        // *** JavaScript (Logic remains largely the same, but with UI updates) ***
+        // *** JavaScript (Mostly the same, except for the background update function) ***
 
         const githubRepo = "rzarisfi/HarfsMusic";
         const githubFolder = "main";
@@ -386,9 +305,9 @@
         const artist = document.getElementById("artist");
         const cover = document.getElementById("cover");
         const customProgress = document.getElementById("custom-progress");
-        const playlistContainer = document.getElementById("playlist"); // Renamed to container
+        const playlistContainer = document.getElementById("playlist");
         const playlistList = document.getElementById("playlist-list");
-        const background = document.getElementById("background");
+        const background = document.getElementById("background"); // This is the dynamic background element
         const shuffleRepeatButton = document.getElementById("shuffle-repeat");
         const playPauseButton = document.getElementById("play-pause");
         const togglePlaylistButton = document.getElementById("toggle-playlist");
@@ -400,37 +319,9 @@
 
         const loadingPage = document.getElementById("loading-page");
         const loadingBackground = document.getElementById("loading-background");
-
-        /* --- Loading Function --- */
-        async function showLoadingPage(imageUrl) {
-            // Set initial cover and background
-            cover.src = "https://via.placeholder.com/400x400?text=Loading...";
-            
-            const img = new Image();
-            img.src = imageUrl;
-            
-            img.onload = () => {
-                loadingBackground.style.backgroundImage = `url(${imageUrl})`;
-                background.style.backgroundImage = `url(${imageUrl})`;
-                
-                // Keep loading page visible for 3 seconds for effect
-                setTimeout(() => {
-                    loadingPage.style.animation = "fadeOut 1s ease-in-out forwards";
-                    setTimeout(() => {
-                        loadingPage.style.display = "none";
-                    }, 1000);
-                }, 3000); // Reduced delay for faster user access
-            };
-
-            img.onerror = () => {
-                console.error("Error loading loading page image. Using fallback.");
-                loadingPage.style.display = "none"; // Hide if fails
-            };
-        }
-
         const loadingImageUrl = "https://raw.githubusercontent.com/rzarisfi/HarfsMusic/main/loading-image.jpg";
-        showLoadingPage(loadingImageUrl);
-        /* -------------------------- */
+
+        // --- Core Functions (Unchanged Logic) ---
 
         function formatTime(seconds) {
             if (isNaN(seconds) || seconds < 0) return '0:00';
@@ -438,23 +329,33 @@
             const remainingSeconds = Math.floor(seconds % 60);
             return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
         }
-
+        
         audio.addEventListener("timeupdate", () => {
             const progressPercent = (audio.currentTime / audio.duration) * 100;
             customProgress.style.width = `${progressPercent}%`;
             currentTimeElement.textContent = formatTime(audio.currentTime);
-            // Duration updates here if it wasn't available at load
             if (durationElement.textContent === '0:00' && !isNaN(audio.duration)) {
                 durationElement.textContent = formatTime(audio.duration);
             }
         });
 
-        audio.addEventListener("loadedmetadata", () => {
-             durationElement.textContent = formatTime(audio.duration);
-        });
+        // Function to update the background with a smooth transition
+        function updatePlayerBackground(imageUrl) {
+            const img = new Image();
+            img.src = imageUrl;
+            img.onload = () => {
+                // Apply the new image to the background element
+                background.style.backgroundImage = `url(${imageUrl})`;
+                cover.src = imageUrl;
+            };
+            img.onerror = () => {
+                // Fallback if cover image fails
+                cover.src = "https://via.placeholder.com/400x400?text=HARFS+Music"; 
+            };
+        }
 
-        async function fetchLyrics(trackTitle, folderPath = "") {
-            document.getElementById("lyrics").textContent = "Loading lyrics...";
+        async function fetchLyrics(trackTitle, folderPath = "") { /* ... (same as before) ... */
+             document.getElementById("lyrics").textContent = "Loading lyrics...";
             try {
                 const encodedTitle = encodeURIComponent(trackTitle);
                 const lyricsPath = folderPath ? 
@@ -470,21 +371,20 @@
                 const lyrics = await response.text();
                 document.getElementById("lyrics").textContent = lyrics;
             } catch (error) {
-                console.error("Error fetching lyrics:", error);
                 document.getElementById("lyrics").textContent = "متن ترانه در دسترس نیست.";
             }
         }
 
         async function fetchTracks() {
+            /* ... (same as before to populate folders array) ... */
             try {
                 const response = await fetch(`https://api.github.com/repos/${githubRepo}/contents?ref=${githubFolder}`);
                 const data = await response.json();
                 
-                folders = []; // Clear current folders
+                folders = []; 
 
                 const items = data.filter(item => item.type === "dir" || (item.type === "file" && item.name.endsWith(".mp3")));
 
-                // Function to process a single folder's tracks
                 const processFolder = async (folder) => {
                     const folderResponse = await fetch(folder.url);
                     const folderData = await folderResponse.json();
@@ -493,7 +393,7 @@
                         .filter(file => file.name.endsWith(".mp3"))
                         .map(file => ({
                             title: file.name.replace(/\.[^/.]+$/, "").replace(/_/g, ' '),
-                            artist: folder.name.replace(/_/g, ' '), // Assuming folder name is artist for simplicity
+                            artist: folder.name.replace(/_/g, ' '), 
                             source: file.download_url,
                             cover: `https://raw.githubusercontent.com/${githubRepo}/${githubFolder}/${folder.path}/${file.name.replace('.mp3', '.jpg')}`
                         }));
@@ -507,7 +407,6 @@
                     }
                 };
 
-                // Handle root tracks separately if any
                 const rootTracks = items
                     .filter(file => file.type === "file" && file.name.endsWith(".mp3"))
                     .map(file => ({
@@ -521,28 +420,28 @@
                     folders.push({
                         name: "Root Tracks",
                         tracks: rootTracks,
-                        path: "" // No path for root
+                        path: "" 
                     });
                 }
                 
-                // Process all folders
                 const folderPromises = data.filter(item => item.type === "dir").map(processFolder);
                 await Promise.all(folderPromises);
 
                 renderPlaylist();
-                // Play the first track by default after loading
                 if (folders.length > 0 && folders[0].tracks.length > 0) {
-                    playTrack(0, 0);
+                    // Start playing the first track
+                    playTrack(0, 0); 
+                } else {
+                    title.textContent = "No tracks found.";
                 }
             } catch (error) {
                 console.error("Error fetching tracks:", error);
                 title.textContent = "Error Loading Tracks";
-                artist.textContent = "Check console for details.";
             }
         }
 
-        function renderPlaylist() {
-            playlistList.innerHTML = folders
+        function renderPlaylist() { /* ... (same as before) ... */
+             playlistList.innerHTML = folders
                 .map((folder, folderIndex) => 
                     `<li>
                         <div class="folder" onclick="toggleFolder(this, ${folderIndex})">
@@ -564,8 +463,6 @@
                     </li>`
                 )
                 .join("");
-
-            // Initially collapse all folders except the first one (optional, keeping it expanded for V1)
             document.querySelectorAll('.folder-tracks').forEach((ul, index) => {
                 if (index > 0) ul.style.display = "none";
             });
@@ -575,21 +472,8 @@
             updateActiveTrackInPlaylist();
         }
 
-        function toggleFolder(element, folderIndex) {
-            const icon = element.querySelector("i");
-            const folderTracks = document.getElementById(`folder-${folderIndex}-tracks`);
-
-            if (folderTracks.style.display === "none") {
-                folderTracks.style.display = "block";
-                icon.classList.replace("fa-folder", "fa-folder-open");
-            } else {
-                folderTracks.style.display = "none";
-                icon.classList.replace("fa-folder-open", "fa-folder");
-            }
-        }
-
-        function updateActiveTrackInPlaylist() {
-            document.querySelectorAll('.playlist-container li').forEach(li => {
+        function updateActiveTrackInPlaylist() { /* ... (same as before) ... */
+             document.querySelectorAll('.playlist-container li').forEach(li => {
                 li.classList.remove('active');
             });
 
@@ -597,7 +481,6 @@
             if (activeTrackElement) {
                 activeTrackElement.classList.add('active');
                 
-                // Ensure the current folder is open
                 const folderListElement = activeTrackElement.closest('.folder-tracks');
                 if (folderListElement && folderListElement.style.display === "none") {
                     folderListElement.style.display = "block";
@@ -606,72 +489,57 @@
                     folderIcon.classList.replace("fa-folder", "fa-folder-open");
                 }
                 
-                // Scroll the playlist to show the active track
                 activeTrackElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
-
+        
         function playTrack(trackIndex, folderIndex) {
-            if (!folders[folderIndex] || !folders[folderIndex].tracks[trackIndex]) {
-                console.error("Track not found!");
-                return;
-            }
+            if (!folders[folderIndex] || !folders[folderIndex].tracks[trackIndex]) return;
 
             currentTrackIndex = trackIndex;
             currentFolderIndex = folderIndex;
             const track = folders[folderIndex].tracks[trackIndex];
             
-            // UI Updates
+            // 1. UI Updates
             title.textContent = track.title;
             artist.textContent = track.artist;
-            playPauseButton.innerHTML = '<i class="fas fa-pause"></i>'; // Assume play on load
+            playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
             updateActiveTrackInPlaylist();
+            
+            // **New Implementation: Dynamic Background Update**
+            updatePlayerBackground(track.cover); 
 
-            // Audio Updates
+            // 2. Audio Updates
             audioSource.src = track.source;
             audio.load();
             audio.play().catch(e => {
-                console.log("Autoplay failed. User interaction needed.", e);
                 playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
             });
 
-            // Cover/Background Update
-            const img = new Image();
-            img.src = track.cover;
-            img.onload = () => {
-                cover.src = track.cover;
-                background.style.backgroundImage = `url(${track.cover})`;
-            };
-            img.onerror = () => {
-                cover.src = "https://via.placeholder.com/400x400?text=HARFS+Music"; // Fallback cover
-                background.style.backgroundImage = `url(${loadingImageUrl})`; // Keep last valid background or loading
-            };
-
-            // Lyrics Update
+            // 3. Lyrics Update
             fetchLyrics(track.title, folders[folderIndex].path);
         }
 
-        function prevTrack() {
+        // --- Control Functions (Same as before) ---
+        function prevTrack() { /* ... */
             const folder = folders[currentFolderIndex];
             currentTrackIndex = (currentTrackIndex - 1 + folder.tracks.length) % folder.tracks.length;
             playTrack(currentTrackIndex, currentFolderIndex);
         }
-
-        function nextTrack() {
+        function nextTrack() { /* ... */
             const folder = folders[currentFolderIndex];
             if (isShuffle) {
                 let newIndex;
                 do {
                     newIndex = Math.floor(Math.random() * folder.tracks.length);
-                } while (newIndex === currentTrackIndex && folder.tracks.length > 1); // Ensure it's a different track unless only one exists
+                } while (newIndex === currentTrackIndex && folder.tracks.length > 1);
                 currentTrackIndex = newIndex;
             } else {
                 currentTrackIndex = (currentTrackIndex + 1) % folder.tracks.length;
             }
             playTrack(currentTrackIndex, currentFolderIndex);
         }
-
-        function togglePlayPause() {
+        function togglePlayPause() { /* ... */
             if (audio.paused) {
                 audio.play();
                 playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
@@ -680,28 +548,23 @@
                 playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
             }
         }
-
-        function toggleShuffleRepeat() {
+        function toggleShuffleRepeat() { /* ... */
             let iconClass = 'fa-music';
             let newTitle = 'Looping Disabled';
 
             if (!isShuffle && !isRepeatAll && !isRepeatOne) {
-                // State 1: Shuffle ON
                 isShuffle = true; isRepeatAll = false; isRepeatOne = false;
                 iconClass = 'fa-shuffle text-yellow-400';
                 newTitle = 'Shuffle Enabled';
             } else if (isShuffle && !isRepeatAll && !isRepeatOne) {
-                // State 2: Repeat All ON
                 isShuffle = false; isRepeatAll = true; isRepeatOne = false;
                 iconClass = 'fa-repeat text-green-400';
                 newTitle = 'Repeat All Enabled';
             } else if (!isShuffle && isRepeatAll && !isRepeatOne) {
-                // State 3: Repeat One ON
                 isShuffle = false; isRepeatAll = false; isRepeatOne = true;
                 iconClass = 'fa-redo text-red-400';
                 newTitle = 'Repeat One Enabled';
             } else {
-                // State 0: All OFF
                 isShuffle = false; isRepeatAll = false; isRepeatOne = false;
                 iconClass = 'fa-music';
                 newTitle = 'Looping Disabled';
@@ -709,20 +572,27 @@
             
             shuffleRepeatButton.innerHTML = `<i class="fas ${iconClass}"></i>`;
             shuffleRepeatButton.title = newTitle;
-            audio.loop = isRepeatOne; // Only loop when Repeat One is active
+            audio.loop = isRepeatOne;
         }
-        
-        // Initialize the button state to OFF
-        toggleShuffleRepeat(); 
-
-        function seek(event) {
-            const progressBar = event.currentTarget;
+        function seek(event) { /* ... */
+             const progressBar = event.currentTarget;
             const clickPosition = event.offsetX;
             const totalWidth = progressBar.clientWidth;
             const seekTime = (clickPosition / totalWidth) * audio.duration;
             audio.currentTime = seekTime;
         }
-
+        function downloadTrack() { /* ... */
+            const currentTrack = folders[currentFolderIndex]?.tracks[currentTrackIndex];
+            if (currentTrack) {
+                const link = document.createElement('a');
+                link.href = currentTrack.source;
+                link.download = `${currentTrack.title} - ${currentTrack.artist}.mp3`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+        
         audio.addEventListener("ended", () => {
             if (isRepeatOne) {
                 audio.currentTime = 0;
@@ -730,7 +600,6 @@
             } else if (isRepeatAll || isShuffle) {
                 nextTrack();
             } else {
-                // Stop and reset button for no loop/shuffle
                 audio.pause();
                 audio.currentTime = 0;
                 playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
@@ -744,22 +613,12 @@
 
         toggleLyricsButton.addEventListener("click", () => {
             lyricsOverlay.classList.toggle("show");
-            // If the overlay is showing, hide the cover text
             cover.style.opacity = lyricsOverlay.classList.contains("show") ? '0' : '1';
         });
 
-        function downloadTrack() {
-            const currentTrack = folders[currentFolderIndex]?.tracks[currentTrackIndex];
-            if (currentTrack) {
-                const link = document.createElement('a');
-                link.href = currentTrack.source;
-                link.download = `${currentTrack.title} - ${currentTrack.artist}.mp3`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
-
+        // --- Initialization ---
+        toggleShuffleRepeat(); 
+        showLoadingPage(loadingImageUrl);
         fetchTracks();
     </script>
 </body>
