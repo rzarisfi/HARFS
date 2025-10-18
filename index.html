@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS Music Player V3.2 - Final Fixes</title>
+    <title>HARFS Music Player V4.0 - Full View Playlist</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow-x: hidden;
+            overflow-x: hidden; 
             position: relative;
             background: #1a1a1a;
             direction: ltr; 
@@ -53,15 +53,39 @@
         }
         .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); z-index: -1; }
 
-        /* --- Player Card Base Style (Optimized for Mobile/Portrait) --- */
+        /* --- New Layout Structure for View Switching --- */
+        .app-container {
+            width: 100%;
+            max-width: 360px; 
+            overflow: hidden; /* پنهان کردن نمای لیست پخش در حالت عادی */
+        }
+        .main-content {
+            display: flex; 
+            width: 200%; 
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+            min-height: 100%;
+        }
+        .player-view, .playlist-view {
+            width: 50%; 
+            min-width: 100%; 
+            box-sizing: border-box;
+            padding: 0 20px; /* Padding for the sides of the view */
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* مرکز کردن در صفحه */
+        }
+        .app-container.show-playlist .main-content {
+            transform: translateX(-50%); /* جابجایی برای نمایش لیست پخش */
+        }
+        /* --- Player Card Base Style --- */
         .music-player-card {
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
             border-radius: 30px;
-            padding: 20px; 
+            padding: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 360px; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -69,56 +93,46 @@
             border: 1px solid rgba(255, 255, 255, 0.18);
         }
 
-        /* Cover Image Styling */
+        /* Cover & Progress */
         .cover-container { width: 90%; padding-top: 90%; position: relative; border-radius: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5); margin-bottom: 25px; overflow: hidden; transition: transform 0.4s ease-in-out; }
         .track-info #title { font-size: 1.5rem; font-weight: 700; margin: 0; color: var(--secondary-color); }
         .track-info #artist { font-size: 1rem; color: rgba(255, 255, 255, 0.8); }
-        
-        /* Progress Bar & Time Fixes */
         .progress-time-area { width: 100%; padding: 0 10px; box-sizing: border-box; } 
         .custom-progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.2); border-radius: 4px; margin: 15px 0; cursor: pointer; position: relative; }
         .custom-progress { height: 100%; background: var(--primary-color); border-radius: 4px; width: 0%; transition: width 0.1s linear; }
-
-        /* Controls */
         .controls button { background-color: var(--primary-color); color: #fff; width: 50px; height: 50px; border-radius: 50%; transition: transform 0.2s; }
         .controls #play-pause { width: 65px; height: 65px; font-size: 1.5rem; margin: 0 20px; background-color: #a855f7; }
-
-        /* Utility Controls (Mobile Spacing Fix) */
         .utility-controls { justify-content: space-between; width: 90%; max-width: 300px; margin: 24px auto 0 auto; }
-        .utility-controls > button { margin: 0 !important; }
-
-        /* Volume Slider & Playlist Button Group */
         .volume-playlist-group { width: 90%; max-width: 300px; margin-top: 20px; }
         #volume-slider { background: var(--primary-color); height: 8px; border-radius: 4px; margin: 0 10px; cursor: pointer; }
 
-        /* Playlist Panel & Search */
-        .playlist-container { 
-            background: var(--dark-overlay); 
-            backdrop-filter: blur(10px); 
-            border-radius: 15px; 
-            width: 300px; 
-            max-height: 450px; 
-            position: fixed; 
-            top: 50%; 
-            right: 20px; 
-            transform: translateY(-50%) translateX(150%); 
-            transition: transform 0.4s ease-out, opacity 0.4s ease-out; 
-            z-index: 10; 
-            opacity: 0; 
+        /* --- Playlist View Styles (Full Screen) --- */
+        .playlist-view {
+            height: 100vh; 
             padding: 20px; 
+            background: #1a1a1a; /* پس زمینه پلی لیست */
         }
-        .playlist-container.show { 
-            transform: translateY(-50%) translateX(0); 
-            opacity: 1; 
+        .playlist-view .playlist-container {
+            background: #282828;
+            border-radius: 15px;
+            padding: 15px;
+            width: 100%;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            /* Resetting absolute positioning from previous version */
+            position: relative;
+            transform: none;
+            backdrop-filter: none;
         }
         #search-input { 
             width: 100%; 
             background: rgba(255, 255, 255, 0.1); 
             border: 1px solid var(--secondary-color); 
             color: white; 
-            padding: 8px 15px; 
-            border-radius: 8px; 
+            padding: 10px 15px; 
+            border-radius: 20px; 
             margin-bottom: 15px; 
+            font-size: 16px;
         }
         .folder-tracks li.active { 
             background-color: var(--primary-color); 
@@ -127,43 +141,63 @@
             padding: 5px 10px; 
             border-radius: 5px;
         }
-        
-        /* --- Media Query for Landscape (Tablet/Desktop) --- */
+        .playlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .playlist-header button {
+            background: none;
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            padding: 5px;
+        }
+
+        /* --- Desktop/Landscape Adjustments (Optional) --- */
         @media (min-width: 768px) and (min-aspect-ratio: 1/1) {
             body { padding: 40px; }
-            .music-player-card { flex-direction: row; max-width: 850px; padding: 40px; text-align: right; gap: 40px; }
-            .cover-container { width: 280px; min-width: 280px; height: 280px; padding-top: 0; margin-bottom: 0; }
-            .track-controls-area { display: flex; flex-direction: column; justify-content: space-between; width: 100%; }
-            .track-info { margin-bottom: 25px; }
-            .track-info #artist, .track-info #title { text-align: right; white-space: normal; text-overflow: clip; } 
-
-            .controls, .utility-controls { justify-content: flex-start; width: auto; max-width: none; }
-            .utility-controls > button { margin-right: 15px !important; }
-            .controls { margin-top: 20px; }
-            .utility-controls { margin-top: 20px; justify-content: flex-start; margin-left: 0; }
-            
-            /* Desktop Volume/Playlist Layout */
-            .volume-playlist-group { width: auto; max-width: none; margin-top: 0; display: flex; align-items: center; justify-content: flex-start; }
-            #volume-slider { width: 100px; margin-right: 20px; }
-
-            .playlist-container { right: 40px; }
+            .app-container {
+                display: flex;
+                max-width: 850px; 
+                overflow: visible; 
+            }
+            .main-content {
+                width: 100%; 
+                transform: none !important;
+                flex-direction: row; 
+                min-height: auto;
+                align-items: flex-start;
+                gap: 40px;
+            }
+            .player-view, .playlist-view {
+                width: 50%;
+                min-width: 400px;
+                padding: 0;
+                height: auto;
+                justify-content: flex-start;
+            }
+            .music-player-card {
+                padding: 40px;
+                width: 100%;
+            }
+            .playlist-view {
+                min-width: 400px;
+                height: auto;
+                padding: 0;
+            }
+            .playlist-view .playlist-container {
+                max-height: 500px;
+            }
+            /* Hide close button on desktop */
+            .playlist-header button {
+                display: none;
+            }
+            .playlist-view .playlist-container {
+                position: relative; /* Keep playlist visible on desktop */
+            }
         }
-
-        /* Loading Page */
-        #loading-page { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            display: flex; align-items: center; justify-content: center; 
-            z-index: 2000; background: rgba(0, 0, 0, 0.9); opacity: 1; visibility: visible; 
-            transition: opacity 1s ease-in-out, visibility 1s; 
-        }
-        #loading-page.hidden-forced { opacity: 0; visibility: hidden; }
-        .loading-background { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background-size: cover; background-position: center; z-index: -1; 
-            animation: zoomIn 5s ease-in-out forwards; 
-        }
-        .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: -1; }
-        @keyframes zoomIn { 0% { transform: scale(1); filter: blur(0); } 100% { transform: scale(1.2); filter: blur(20px); } }
     </style>
 </head>
 <body>
@@ -176,77 +210,91 @@
     <div class="background" id="background"></div>
     <div class="overlay"></div>
 
-    <div class="music-player-card">
-        <div class="cover-container">
-            <img id="cover" src="https://via.placeholder.com/400x400?text=HARFS+Music" alt="Album Cover">
-            <div id="lyrics-overlay" class="lyrics-overlay">
-                <div id="lyrics" class="lyrics-text">Loading lyrics...</div>
-            </div>
-        </div>
+    <div class="app-container" id="app-container">
+        <div class="main-content" id="main-content">
 
-        <div class="track-controls-area">
-            
-            <div class="track-info">
-                <h2 id="title" class="text-white text-2xl font-extrabold">Loading...</h2>
-                <p id="artist" class="text-purple-300 text-base font-medium">Please wait</p>
-            </div>
+            <div class="player-view">
+                <div class="music-player-card">
+                    <div class="cover-container">
+                        <img id="cover" src="https://via.placeholder.com/400x400?text=HARFS+Music" alt="Album Cover">
+                        <div id="lyrics-overlay" class="lyrics-overlay">
+                            <div id="lyrics" class="lyrics-text">Loading lyrics...</div>
+                        </div>
+                    </div>
 
-            <div class="progress-time-area" style="direction: ltr;">
-                <div class="custom-progress-bar" onclick="seek(event)">
-                    <div class="custom-progress" id="custom-progress"></div>
+                    <div class="track-controls-area w-full">
+                        <div class="track-info">
+                            <h2 id="title" class="text-white text-2xl font-extrabold">Loading...</h2>
+                            <p id="artist" class="text-purple-300 text-base font-medium">Please wait</p>
+                        </div>
+
+                        <div class="progress-time-area" style="direction: ltr;">
+                            <div class="custom-progress-bar" onclick="seek(event)">
+                                <div class="custom-progress" id="custom-progress"></div>
+                            </div>
+                            <div class="time-info flex justify-between w-full text-sm text-gray-300 font-medium">
+                                <span id="current-time">0:00</span>
+                                <span id="duration">0:00</span>
+                            </div>
+                        </div>
+
+                        <div class="controls flex justify-center items-center mt-8" style="direction: ltr;">
+                            <button onclick="prevTrack()" class="focus:outline-none">
+                                <i class="fas fa-backward"></i>
+                            </button>
+                            <button onclick="togglePlayPause()" id="play-pause" class="focus:outline-none">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button onclick="nextTrack()" class="focus:outline-none">
+                                <i class="fas fa-forward"></i>
+                            </button>
+                        </div>
+
+                        <div class="utility-controls flex items-center mt-6" style="direction: ltr;">
+                            <button id="shuffle-repeat" onclick="toggleShuffleRepeat()" title="Shuffle/Repeat Mode" class="focus:outline-none">
+                                <i class="fas fa-music"></i>
+                            </button>
+                            <button id="toggle-lyrics" title="Toggle Lyrics" class="focus:outline-none">
+                                <i class="fas fa-align-left"></i>
+                            </button>
+                            <button onclick="downloadTrack()" title="Download Track" class="focus:outline-none">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="volume-playlist-group flex items-center justify-between" style="direction: ltr;">
+                            <button id="mute-button" onclick="toggleMute()" title="Mute/Unmute" class="focus:outline-none">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1">
+                            <button id="toggle-playlist" title="Toggle Playlist" class="focus:outline-none ml-4" onclick="showPlaylistView()">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="time-info flex justify-between w-full text-sm text-gray-300 font-medium">
-                    <span id="current-time">0:00</span>
-                    <span id="duration">0:00</span>
+            </div>
+
+            <div class="playlist-view">
+                <div class="playlist-container" id="playlist">
+                    <div class="playlist-header">
+                        <h3 class="text-2xl font-bold text-white">فهرست و جستجو</h3>
+                         <button onclick="hidePlaylistView()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <input type="text" id="search-input" placeholder="جستجوی آهنگ یا خواننده..." onkeyup="filterPlaylist()">
+                    
+                    <ul id="playlist-list" class="space-y-1 overflow-y-auto mt-4" style="max-height: 80%;"></ul>
                 </div>
-            </div>
-
-            <div class="controls flex justify-center items-center mt-8" style="direction: ltr;">
-                <button onclick="prevTrack()" class="focus:outline-none">
-                    <i class="fas fa-backward"></i>
-                </button>
-                <button onclick="togglePlayPause()" id="play-pause" class="focus:outline-none">
-                    <i class="fas fa-play"></i>
-                </button>
-                <button onclick="nextTrack()" class="focus:outline-none">
-                    <i class="fas fa-forward"></i>
-                </button>
-            </div>
-
-            <div class="utility-controls flex items-center mt-6" style="direction: ltr;">
-                <button id="shuffle-repeat" onclick="toggleShuffleRepeat()" title="Shuffle/Repeat Mode" class="focus:outline-none">
-                    <i class="fas fa-music"></i>
-                </button>
-                <button id="toggle-lyrics" title="Toggle Lyrics" class="focus:outline-none">
-                    <i class="fas fa-align-left"></i>
-                </button>
-                <button onclick="downloadTrack()" title="Download Track" class="focus:outline-none">
-                    <i class="fas fa-download"></i>
-                </button>
-            </div>
-            
-            <div class="volume-playlist-group flex items-center justify-between" style="direction: ltr;">
-                <button id="mute-button" onclick="toggleMute()" title="Mute/Unmute" class="focus:outline-none">
-                    <i class="fas fa-volume-up"></i>
-                </button>
-                <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1">
-                 <button id="toggle-playlist" title="Toggle Playlist" class="focus:outline-none ml-4">
-                    <i class="fas fa-list"></i>
-                </button>
             </div>
             
         </div>
-
         <audio id="audio" style="display: none;">
             <source id="audio-source" src="" type="audio/mp3">
             Your browser does not support the audio element.
         </audio>
-    </div>
-
-    <div class="playlist-container" id="playlist">
-        <h3 class="text-xl font-bold mb-4 text-white border-b border-purple-500 pb-2">📂 Playlist</h3>
-        <input type="text" id="search-input" placeholder="جستجوی آهنگ یا خواننده..." onkeyup="filterPlaylist()">
-        <ul id="playlist-list" class="space-y-1 overflow-y-auto" style="max-height: 80%;"></ul>
     </div>
 
     <script>
@@ -256,8 +304,8 @@
         const githubFolder = "main";
 
         let folders = [];
-        let allTracks = []; // Flat list of all tracks for searching
-        let activeTracks = []; // لیست آهنگ‌هایی که در حال حاضر نمایش داده می‌شوند (فیلتر شده یا اصلی)
+        let allTracks = []; 
+        let activeTracks = []; 
         let currentTrackIndex = 0;
         let currentFolderIndex = 0;
         let isShuffle = false;
@@ -271,12 +319,11 @@
         const artist = document.getElementById("artist");
         const cover = document.getElementById("cover");
         const customProgress = document.getElementById("custom-progress");
-        const playlistContainer = document.getElementById("playlist");
+        const appContainer = document.getElementById("app-container"); // New
         const playlistList = document.getElementById("playlist-list");
         const background = document.getElementById("background");
         const shuffleRepeatButton = document.getElementById("shuffle-repeat");
         const playPauseButton = document.getElementById("play-pause");
-        const togglePlaylistButton = document.getElementById("toggle-playlist");
         const lyricsOverlay = document.getElementById("lyrics-overlay");
         const currentTimeElement = document.getElementById("current-time");
         const durationElement = document.getElementById("duration");
@@ -286,6 +333,18 @@
         const muteButton = document.getElementById("mute-button"); 
         const searchInput = document.getElementById("search-input"); 
         const loadingImageUrl = "https://raw.githubusercontent.com/rzarisfi/HarfsMusic/main/loading-image.jpg";
+        
+        // --- View Management ---
+        function showPlaylistView() {
+            appContainer.classList.add("show-playlist");
+            // اطمینان از به روز رسانی لیست فعال هنگام باز کردن (اگر در حالت جستجو هستیم)
+            const isSearchMode = searchInput.value.trim() !== "";
+            updateActiveTrackInPlaylist(isSearchMode ? null : undefined);
+        }
+
+        function hidePlaylistView() {
+            appContainer.classList.remove("show-playlist");
+        }
         
         // --- Loading Screen Logic ---
         function forceHideLoadingPage() {
@@ -349,7 +408,7 @@
             }
         }
 
-        // --- Track Fetching ---
+        // --- Track Fetching (No Change) ---
         async function fetchTracks() {
             try {
                 const response = await fetch(`https://api.github.com/repos/${githubRepo}/contents?ref=${githubFolder}`);
@@ -380,7 +439,7 @@
                             path: folder.path
                         };
                         folders.push(folderData);
-                        tracks.forEach(track => allTracks.push({ ...track, folderIndex: folders.length - 1 })); // Add to flat list
+                        tracks.forEach(track => allTracks.push({ ...track, folderIndex: folders.length - 1 })); 
                     }
                 };
 
@@ -400,13 +459,13 @@
                         path: "" 
                     };
                     folders.push(folderData);
-                    rootTracks.forEach(track => allTracks.push({ ...track, folderIndex: folders.length - 1 })); // Add to flat list
+                    rootTracks.forEach(track => allTracks.push({ ...track, folderIndex: folders.length - 1 })); 
                 }
                 
                 const folderPromises = data.filter(item => item.type === "dir").map(processFolder);
                 await Promise.all(folderPromises);
 
-                renderPlaylist(null); // Render initial full playlist
+                renderPlaylist(null); 
                 if (folders.length > 0 && folders[0].tracks.length > 0) {
                     playTrack(0, 0); 
                 } else {
@@ -419,19 +478,19 @@
             }
         }
 
-        // --- Playlist Management (FIXED for Search) ---
+        // --- Playlist Management (Search Logic V4) ---
         function renderPlaylist(filteredTracks = null) { 
-            if (!filteredTracks) {
-                activeTracks = [...allTracks]; // همه آهنگ‌ها فعال هستند
+            const isSearchMode = filteredTracks !== null;
+            
+            if (!isSearchMode) {
+                activeTracks = [...allTracks]; 
             } else {
-                activeTracks = filteredTracks; // فقط آهنگ‌های فیلتر شده فعال هستند
+                activeTracks = filteredTracks; 
             }
             
             let displayFolders = folders;
-            let isSearchMode = false;
 
-            if (filteredTracks) {
-                isSearchMode = true;
+            if (isSearchMode) {
                 // ایجاد یک ساختار پوشه موقت فقط برای نمایش نتایج جستجو
                 displayFolders = [{
                     name: `نتایج جستجو (${filteredTracks.length})`,
@@ -440,7 +499,7 @@
                         artist: t.artist,
                         source: t.source,
                         cover: t.cover,
-                        activeIndex: index // ایندکس در لیست فیلتر شده (activeTracks) برای پخش صحیح
+                        activeIndex: index 
                     })),
                     path: ""
                 }];
@@ -490,7 +549,7 @@
                 track.artist.toLowerCase().includes(query)
             );
             
-            renderPlaylist(filteredTracks); // ارسال لیست فیلتر شده
+            renderPlaylist(filteredTracks); 
         }
         
         function toggleFolder(element, folderIndex, isSearchMode) {
@@ -508,10 +567,6 @@
             }
         }
         
-        function hidePlaylist() { // NEW Utility Function
-            playlistContainer.classList.remove("show");
-        }
-
         // --- Player Controls ---
         
         function playTrack(trackIndex, folderIndex) {
@@ -522,23 +577,24 @@
             currentFolderIndex = folderIndex;
             const track = folders[folderIndex].tracks[trackIndex];
             
-            playFromActiveList(activeTracks.findIndex(t => t.title === track.title && t.artist === track.artist));
-            hidePlaylist(); // بستن لیست پخش
+            // یافتن ایندکس در لیست فعال (برای هایلایت صحیح)
+            const activeIndex = activeTracks.findIndex(t => t.title === track.title && t.artist === track.artist);
+
+            playFromActiveList(activeIndex);
+            hidePlaylistView(); // بستن لیست پخش
         }
 
         function playFromActiveList(activeIndex) { 
-            if (!activeTracks[activeIndex]) return;
+            if (activeIndex === -1 || !activeTracks[activeIndex]) return;
 
             const track = activeTracks[activeIndex];
             
-            // یافتن ایندکس اصلی آهنگ در آرایه folders
-            let foundOriginal = false;
+            // یافتن ایندکس اصلی آهنگ در آرایه folders برای به‌روزرسانی متغیرهای global
             for(let fIndex = 0; fIndex < folders.length; fIndex++) {
                 const tIndex = folders[fIndex].tracks.findIndex(t => t.title === track.title && t.artist === track.artist);
                 if (tIndex !== -1) {
                     currentFolderIndex = fIndex;
                     currentTrackIndex = tIndex;
-                    foundOriginal = true;
                     break;
                 }
             }
@@ -552,6 +608,7 @@
             audio.src = track.source;
             audio.load();
             audio.play().catch(e => {
+                console.error("Autoplay failed:", e);
                 playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
             });
 
@@ -559,7 +616,10 @@
             fetchLyrics(track.title, trackPath);
             updateActiveTrackInPlaylist(activeIndex); 
             
-            hidePlaylist(); // بستن لیست پخش
+            // برای دسکتاپ، پلی‌لیست را نبندید
+             if (window.innerWidth <= 768) {
+                hidePlaylistView(); 
+            }
         }
 
 
@@ -659,10 +719,22 @@
             });
 
             let selector;
+            const isSearchMode = searchInput.value.trim() !== "";
             
-            if (searchInput.value.trim() !== "") {
-                const searchActiveIndex = activeIndex !== undefined ? activeIndex : activeTracks.findIndex(t => t.title === folders[currentFolderIndex].tracks[currentTrackIndex].title && t.artist === folders[currentFolderIndex].tracks[currentTrackIndex].artist);
-                selector = `.folder-tracks li[data-folder-index="active"][data-track-index="${searchActiveIndex}"]`;
+            if (isSearchMode) {
+                // پیدا کردن ایندکس فعال در activeTracks
+                const currentTrackInActive = allTracks.find(t => 
+                    t.title === folders[currentFolderIndex]?.tracks[currentTrackIndex]?.title && 
+                    t.artist === folders[currentFolderIndex]?.tracks[currentTrackIndex]?.artist
+                );
+                
+                const searchActiveIndex = currentTrackInActive ? activeTracks.findIndex(t => t.title === currentTrackInActive.title && t.artist === currentTrackInActive.artist) : -1;
+                
+                if (searchActiveIndex !== -1) {
+                    selector = `.folder-tracks li[data-folder-index="active"][data-track-index="${searchActiveIndex}"]`;
+                } else {
+                    return; // آهنگ فعلی در نتایج جستجو نیست
+                }
                 
             } else {
                 selector = `.folder-tracks li[data-folder-index="${currentFolderIndex}"][data-track-index="${currentTrackIndex}"]`;
@@ -718,11 +790,6 @@
             } else {
                 muteButton.innerHTML = '<i class="fas fa-volume-off"></i>';
             }
-        });
-
-        // تغییر دکمه لیست پخش برای استفاده از تابع قبلی
-        togglePlaylistButton.addEventListener("click", () => {
-            playlistContainer.classList.toggle("show");
         });
         
         document.getElementById("toggle-lyrics").addEventListener("click", () => {
