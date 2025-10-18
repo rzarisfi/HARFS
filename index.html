@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS Music Player V3.0 - Advanced & Responsive</title>
+    <title>HARFS Music Player V3.1 - Search Fix</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -99,13 +99,12 @@
         
         /* --- Media Query for Landscape (Tablet/Desktop) --- */
         @media (min-width: 768px) and (min-aspect-ratio: 1/1) {
-            /* ... (Desktop styles - kept mostly the same) ... */
             body { padding: 40px; }
             .music-player-card { flex-direction: row; max-width: 850px; padding: 40px; text-align: right; gap: 40px; }
             .cover-container { width: 280px; min-width: 280px; height: 280px; padding-top: 0; margin-bottom: 0; }
             .track-controls-area { display: flex; flex-direction: column; justify-content: space-between; width: 100%; }
             .track-info { margin-bottom: 25px; }
-            .track-info #artist, .track-info #title { text-align: right; white-space: normal; text-overflow: clip; } /* Allow multi-line titles on desktop */
+            .track-info #artist, .track-info #title { text-align: right; white-space: normal; text-overflow: clip; } 
 
             .controls, .utility-controls { justify-content: flex-start; width: auto; max-width: none; }
             .utility-controls > button { margin-right: 15px !important; }
@@ -184,7 +183,7 @@
                 <button onclick="downloadTrack()" title="Download Track" class="focus:outline-none">
                     <i class="fas fa-download"></i>
                 </button>
-                </div>
+            </div>
             
             <div class="volume-playlist-group flex items-center justify-between" style="direction: ltr;">
                 <button id="mute-button" onclick="toggleMute()" title="Mute/Unmute" class="focus:outline-none">
@@ -207,7 +206,7 @@
     <div class="playlist-container" id="playlist">
         <h3 class="text-xl font-bold mb-4 text-white border-b border-purple-500 pb-2">📂 Playlist</h3>
         <input type="text" id="search-input" placeholder="جستجوی آهنگ یا خواننده..." onkeyup="filterPlaylist()">
-        <ul id="playlist-list" class="space-y-1"></ul>
+        <ul id="playlist-list" class="space-y-1 overflow-y-auto" style="max-height: 80%;"></ul>
     </div>
 
     <script>
@@ -218,6 +217,7 @@
 
         let folders = [];
         let allTracks = []; // Flat list of all tracks for searching
+        let activeTracks = []; // NEW: لیست آهنگ‌هایی که در حال حاضر نمایش داده می‌شوند (فیلتر شده یا اصلی)
         let currentTrackIndex = 0;
         let currentFolderIndex = 0;
         let isShuffle = false;
@@ -242,12 +242,12 @@
         const durationElement = document.getElementById("duration");
         const loadingPage = document.getElementById("loading-page");
         const loadingBackground = document.getElementById("loading-background");
-        const volumeSlider = document.getElementById("volume-slider"); // NEW
-        const muteButton = document.getElementById("mute-button"); // NEW
-        const searchInput = document.getElementById("search-input"); // NEW
+        const volumeSlider = document.getElementById("volume-slider"); 
+        const muteButton = document.getElementById("mute-button"); 
+        const searchInput = document.getElementById("search-input"); 
         const loadingImageUrl = "https://raw.githubusercontent.com/rzarisfi/HarfsMusic/main/loading-image.jpg";
         
-        // --- Loading Screen Logic (Kept same) ---
+        // --- Loading Screen Logic ---
         function forceHideLoadingPage() {
             loadingPage.classList.add("hidden-forced");
             setTimeout(() => {
@@ -309,7 +309,7 @@
             }
         }
 
-        // --- Track Fetching (Kept same) ---
+        // --- Track Fetching ---
         async function fetchTracks() {
             try {
                 const response = await fetch(`https://api.github.com/repos/${githubRepo}/contents?ref=${githubFolder}`);
@@ -366,7 +366,7 @@
                 const folderPromises = data.filter(item => item.type === "dir").map(processFolder);
                 await Promise.all(folderPromises);
 
-                renderPlaylist();
+                renderPlaylist(null); // Render initial full playlist
                 if (folders.length > 0 && folders[0].tracks.length > 0) {
                     playTrack(0, 0); 
                 } else {
@@ -379,46 +379,69 @@
             }
         }
 
-        // --- Playlist Management (Modified for Search) ---
-        function renderPlaylist(filteredFolders = folders) { 
-             playlistList.innerHTML = filteredFolders
+        // --- Playlist Management (FIXED for Search) ---
+        function renderPlaylist(filteredTracks = null) { 
+            if (!filteredTracks) {
+                activeTracks = [...allTracks]; // همه آهنگ‌ها فعال هستند
+            } else {
+                activeTracks = filteredTracks; // فقط آهنگ‌های فیلتر شده فعال هستند
+            }
+            
+            let displayFolders = folders;
+            let isSearchMode = false;
+
+            if (filteredTracks) {
+                isSearchMode = true;
+                // ایجاد یک ساختار پوشه موقت فقط برای نمایش نتایج جستجو
+                displayFolders = [{
+                    name: `نتایج جستجو (${filteredTracks.length})`,
+                    tracks: filteredTracks.map((t, index) => ({ 
+                        title: t.title,
+                        artist: t.artist,
+                        source: t.source,
+                        cover: t.cover,
+                        activeIndex: index // ایندکس در لیست فیلتر شده (activeTracks) برای پخش صحیح
+                    })),
+                    path: ""
+                }];
+            }
+            
+            // رندر کردن لیست بر اساس displayFolders
+            playlistList.innerHTML = displayFolders
                 .map((folder, folderIndex) => 
                     `<li>
-                        <div class="folder text-white text-lg font-semibold py-2 cursor-pointer" onclick="toggleFolder(this, ${folderIndex})">
-                            <i class="fas fa-folder-open text-purple-400"></i>
+                        <div class="folder text-white text-lg font-semibold py-2 cursor-pointer" onclick="toggleFolder(this, ${folderIndex}, ${isSearchMode})">
+                            <i class="fas ${isSearchMode || folderIndex === currentFolderIndex ? 'fa-folder-open' : 'fa-folder'} text-purple-400"></i>
                             <span class="truncate pr-2">${folder.name}</span>
                         </div>
-                        <ul class="folder-tracks space-y-1 text-gray-300 pr-4" id="folder-${folderIndex}-tracks">
+                        <ul class="folder-tracks space-y-1 text-gray-300 pr-4" id="folder-${folderIndex}-tracks" style="display: ${isSearchMode || folderIndex === currentFolderIndex ? 'block' : 'none'};">
                             ${folder.tracks
-                                .map((track, trackIndex) => 
-                                    `<li class="hover:bg-gray-700 transition duration-150 ease-in-out truncate p-1 cursor-pointer" 
-                                        data-track-index="${trackIndex}" 
-                                        data-folder-index="${folderIndex}" 
-                                        onclick="playTrack(${trackIndex}, ${folderIndex})">
-                                        ${track.title}
-                                    </li>`
-                                )
+                                .map((track, trackIndex) => {
+                                    const indexToUse = isSearchMode ? track.activeIndex : trackIndex;
+                                    const folderIndexAttr = isSearchMode ? 'active' : folderIndex;
+                                    
+                                    return `<li class="hover:bg-gray-700 transition duration-150 ease-in-out truncate p-1 cursor-pointer" 
+                                        data-track-index="${indexToUse}" 
+                                        data-folder-index="${folderIndexAttr}" 
+                                        onclick="playFromActiveList(${indexToUse})">
+                                        ${track.title} 
+                                        <span class="text-xs text-gray-500">${isSearchMode ? ` - ${track.artist}` : ''}</span>
+                                    </li>`;
+                                })
                                 .join("")}
                         </ul>
                     </li>`
                 )
                 .join("");
             
-            // Only open the current folder by default
-            document.querySelectorAll('.folder-tracks').forEach((ul, index) => {
-                if (index !== currentFolderIndex || filteredFolders !== folders) { // Keep current folder open unless filtered
-                    ul.style.display = "none";
-                    ul.previousElementSibling.querySelector('i').classList.replace("fa-folder-open", "fa-folder");
-                }
-            });
-            updateActiveTrackInPlaylist();
+            updateActiveTrackInPlaylist(isSearchMode ? null : undefined);
         }
-
-        function filterPlaylist() { // NEW Search Function
+        
+        function filterPlaylist() { 
             const query = searchInput.value.toLowerCase();
             
             if (query.trim() === "") {
-                renderPlaylist(folders);
+                renderPlaylist(null); 
                 return;
             }
             
@@ -427,32 +450,12 @@
                 track.artist.toLowerCase().includes(query)
             );
             
-            // Reconstruct the folders structure from filtered tracks
-            const newFoldersMap = new Map();
-            filteredTracks.forEach(track => {
-                const originalFolder = folders[track.folderIndex];
-                if (!newFoldersMap.has(originalFolder.name)) {
-                    newFoldersMap.set(originalFolder.name, { 
-                        name: originalFolder.name, 
-                        tracks: [],
-                        path: originalFolder.path
-                    });
-                }
-                newFoldersMap.get(originalFolder.name).tracks.push(track);
-            });
-            
-            const filteredFolders = Array.from(newFoldersMap.values());
-            
-            renderPlaylist(filteredFolders);
-            
-            // Auto-open all folders after search
-            document.querySelectorAll('.folder-tracks').forEach(ul => {
-                ul.style.display = "block";
-                ul.previousElementSibling.querySelector('i').classList.replace("fa-folder", "fa-folder-open");
-            });
+            renderPlaylist(filteredTracks); // ارسال لیست فیلتر شده
         }
         
-        function toggleFolder(element, folderIndex) {
+        function toggleFolder(element, folderIndex, isSearchMode) {
+            if (isSearchMode) return; // در حالت جستجو، پوشه‌ها همیشه باز هستند.
+            
             const icon = element.querySelector("i");
             const folderTracks = document.getElementById(`folder-${folderIndex}-tracks`);
 
@@ -465,18 +468,39 @@
             }
         }
 
-        // --- Player Controls (Modified for Volume) ---
+        // --- Player Controls ---
+        
         function playTrack(trackIndex, folderIndex) {
+            // این تابع فقط برای پخش از لیست اصلی (غیر جستجو) استفاده می‌شود
             if (!folders[folderIndex] || !folders[folderIndex].tracks[trackIndex]) return;
 
             currentTrackIndex = trackIndex;
             currentFolderIndex = folderIndex;
             const track = folders[folderIndex].tracks[trackIndex];
             
+            playFromActiveList(activeTracks.findIndex(t => t.title === track.title && t.artist === track.artist));
+        }
+
+        function playFromActiveList(activeIndex) { // NEW Play Function for Search Results
+            if (!activeTracks[activeIndex]) return;
+
+            const track = activeTracks[activeIndex];
+            
+            // یافتن ایندکس اصلی آهنگ در آرایه folders برای به‌روزرسانی currentTrackIndex/FolderIndex
+            let foundOriginal = false;
+            for(let fIndex = 0; fIndex < folders.length; fIndex++) {
+                const tIndex = folders[fIndex].tracks.findIndex(t => t.title === track.title && t.artist === track.artist);
+                if (tIndex !== -1) {
+                    currentFolderIndex = fIndex;
+                    currentTrackIndex = tIndex;
+                    foundOriginal = true;
+                    break;
+                }
+            }
+            
             title.textContent = track.title;
             artist.textContent = track.artist;
             playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
-            updateActiveTrackInPlaylist();
             
             updatePlayerBackground(track.cover); 
 
@@ -486,10 +510,13 @@
                 playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
             });
 
-            fetchLyrics(track.title, folders[folderIndex].path);
+            const trackPath = folders[currentFolderIndex] ? folders[currentFolderIndex].path : "";
+            fetchLyrics(track.title, trackPath);
+            updateActiveTrackInPlaylist(activeIndex); // به‌روزرسانی نمایش آهنگ فعال
         }
 
-        function toggleMute() { // NEW Mute/Unmute
+
+        function toggleMute() { 
             if (audio.volume > 0) {
                 lastVolume = audio.volume;
                 audio.volume = 0;
@@ -502,46 +529,12 @@
             }
         }
 
-        // --- Event Listeners ---
-        audio.addEventListener("timeupdate", () => {
-            const progressPercent = (audio.currentTime / audio.duration) * 100;
-            customProgress.style.width = `${progressPercent}%`;
-            currentTimeElement.textContent = formatTime(audio.currentTime);
-            if (durationElement.textContent === '0:00' && !isNaN(audio.duration)) {
-                durationElement.textContent = formatTime(audio.duration);
-            }
-        });
-
-        volumeSlider.addEventListener("input", (e) => { // NEW Volume Slider Listener
-            audio.volume = e.target.value;
-            if (audio.volume > 0) {
-                muteButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-                lastVolume = audio.volume;
-            } else {
-                muteButton.innerHTML = '<i class="fas fa-volume-off"></i>';
-            }
-        });
-
-        // ... (Other functions like prevTrack, nextTrack, togglePlayPause, etc. remain the same) ...
-
-        // --- Initialization ---
-        // Call fetchTracks last to start the whole process
-        document.addEventListener('DOMContentLoaded', () => {
-             // Set initial volume slider value
-            volumeSlider.value = audio.volume; 
-            toggleShuffleRepeat(); 
-            showLoadingPage(loadingImageUrl);
-            fetchTracks();
-        });
-        
-        // The remaining functions (prevTrack, nextTrack, togglePlayPause, toggleShuffleRepeat, seek, downloadTrack, audio.ended, togglePlaylistButton.click, toggleLyricsButton.click)
-        // should be included here as they are essential to the player's functionality.
-        
         function prevTrack() { 
             const folder = folders[currentFolderIndex];
             currentTrackIndex = (currentTrackIndex - 1 + folder.tracks.length) % folder.tracks.length;
             playTrack(currentTrackIndex, currentFolderIndex);
         }
+        
         function nextTrack() { 
             const folder = folders[currentFolderIndex];
             if (isShuffle) {
@@ -555,6 +548,7 @@
             }
             playTrack(currentTrackIndex, currentFolderIndex);
         }
+        
         function togglePlayPause() { 
             if (audio.paused) {
                 audio.play();
@@ -564,6 +558,7 @@
                 playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
             }
         }
+        
         function toggleShuffleRepeat() { 
             let iconClass = 'fa-music';
             let newTitle = 'Looping Disabled';
@@ -590,6 +585,7 @@
             shuffleRepeatButton.title = newTitle;
             audio.loop = isRepeatOne;
         }
+        
         function seek(event) { 
              const progressBar = event.currentTarget;
             const clickPosition = event.offsetX;
@@ -597,6 +593,7 @@
             const seekTime = (clickPosition / totalWidth) * audio.duration;
             audio.currentTime = seekTime;
         }
+        
         function downloadTrack() { 
             const currentTrack = folders[currentFolderIndex]?.tracks[currentTrackIndex];
             if (currentTrack) {
@@ -608,32 +605,27 @@
                 document.body.removeChild(link);
             }
         }
-        audio.addEventListener("ended", () => {
-            if (isRepeatOne) {
-                audio.currentTime = 0;
-                audio.play();
-            } else if (isRepeatAll || isShuffle) {
-                nextTrack();
-            } else {
-                audio.pause();
-                audio.currentTime = 0;
-                playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-                customProgress.style.width = '0%';
-            }
-        });
-        togglePlaylistButton.addEventListener("click", () => {
-            playlistContainer.classList.toggle("show");
-        });
-        document.getElementById("toggle-lyrics").addEventListener("click", () => {
-            lyricsOverlay.classList.toggle("show");
-            cover.style.opacity = lyricsOverlay.classList.contains("show") ? '0' : '1';
-        });
-        function updateActiveTrackInPlaylist() { 
-             document.querySelectorAll('.playlist-container li').forEach(li => {
+        
+        function updateActiveTrackInPlaylist(activeIndex = undefined) { 
+            document.querySelectorAll('.playlist-container li').forEach(li => {
                 li.classList.remove('active');
             });
 
-            const activeTrackElement = document.querySelector(`.folder-tracks li[data-folder-index="${currentFolderIndex}"][data-track-index="${currentTrackIndex}"]`);
+            let selector;
+            
+            if (searchInput.value.trim() !== "") {
+                // حالت جستجو: از activeIndex استفاده می‌کنیم
+                // activeIndex را اگر از playFromActiveList آمده باشد یا در لیست فعال پیدا شود، استفاده می‌کنیم.
+                const searchActiveIndex = activeIndex !== undefined ? activeIndex : activeTracks.findIndex(t => t.title === folders[currentFolderIndex].tracks[currentTrackIndex].title && t.artist === folders[currentFolderIndex].tracks[currentTrackIndex].artist);
+                selector = `.folder-tracks li[data-folder-index="active"][data-track-index="${searchActiveIndex}"]`;
+                
+            } else {
+                // حالت عادی: از ایندکس اصلی استفاده می‌کنیم
+                selector = `.folder-tracks li[data-folder-index="${currentFolderIndex}"][data-track-index="${currentTrackIndex}"]`;
+            }
+            
+            const activeTrackElement = document.querySelector(selector);
+            
             if (activeTrackElement) {
                 activeTrackElement.classList.add('active');
                 
@@ -648,6 +640,58 @@
                 activeTrackElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
+
+
+        // --- Event Listeners ---
+        audio.addEventListener("timeupdate", () => {
+            const progressPercent = (audio.currentTime / audio.duration) * 100;
+            customProgress.style.width = `${progressPercent}%`;
+            currentTimeElement.textContent = formatTime(audio.currentTime);
+            if (durationElement.textContent === '0:00' && !isNaN(audio.duration)) {
+                durationElement.textContent = formatTime(audio.duration);
+            }
+        });
+
+        audio.addEventListener("ended", () => {
+            if (isRepeatOne) {
+                audio.currentTime = 0;
+                audio.play();
+            } else if (isRepeatAll || isShuffle) {
+                nextTrack();
+            } else {
+                audio.pause();
+                audio.currentTime = 0;
+                playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+                customProgress.style.width = '0%';
+            }
+        });
+        
+        volumeSlider.addEventListener("input", (e) => { 
+            audio.volume = e.target.value;
+            if (audio.volume > 0) {
+                muteButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+                lastVolume = audio.volume;
+            } else {
+                muteButton.innerHTML = '<i class="fas fa-volume-off"></i>';
+            }
+        });
+
+        togglePlaylistButton.addEventListener("click", () => {
+            playlistContainer.classList.toggle("show");
+        });
+        
+        document.getElementById("toggle-lyrics").addEventListener("click", () => {
+            lyricsOverlay.classList.toggle("show");
+            cover.style.opacity = lyricsOverlay.classList.contains("show") ? '0' : '1';
+        });
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            volumeSlider.value = audio.volume; 
+            toggleShuffleRepeat(); 
+            showLoadingPage(loadingImageUrl);
+            fetchTracks();
+        });
     </script>
 </body>
 </html>
