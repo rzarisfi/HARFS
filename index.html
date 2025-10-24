@@ -351,7 +351,7 @@
         const GITHUB_MATCHES_FILE = "match_history.json"; 
         
         // ⚠️ رمز عبور ادمین
-        const ADMIN_PASSWORD = "111"; 
+        const ADMIN_PASSWORD = "0000"; 
 
         // Global Team List (English keys)
         const TEAM_NAMES = [
@@ -396,24 +396,31 @@
         }
         
         // NEW: Handles the main menu admin button click
-        function showAdminOptions() {
-             if (!checkAdminAccess()) return;
-             
-             // Check for token once access is confirmed
-             getGitHubToken().then(token => {
-                 if (!token) {
-                     alert("برای ثبت و مدیریت داده‌ها، به توکن گیت‌هاب نیاز است.");
-                     return;
-                 }
-                 
-                 // Prompt user for next action
-                 if (confirm("دسترسی مدیریت برقرار شد.\n\nبرای ثبت نتیجه جدید OK و برای مدیریت تاریخچه CANCEL را بزنید.")) {
-                     showRegistrationModal();
-                 } else {
-                     showAdminOptionsModal();
-                 }
-             });
-        }
+        // Handles the main menu admin button click
+function showAdminOptions() {
+     if (!checkAdminAccess()) return; // اولین مرحله: چک کردن رمز ادمین
+
+     let TOKEN = localStorage.getItem('github_pat');
+
+     if (!TOKEN) {
+         // اگر توکن موجود نیست، از کاربر بخواهید آن را وارد کند.
+         TOKEN = prompt("برای ثبت و مدیریت داده‌ها، به GitHub Personal Access Token (PAT) نیاز است. لطفاً آن را وارد کنید:");
+         if (!TOKEN) {
+              alert("عملیات لغو شد. بدون توکن، امکان ثبت یا مدیریت بازی‌ها وجود ندارد.");
+              return;
+         }
+         localStorage.setItem('github_pat', TOKEN);
+         sha = null; // ریست SHA برای اطمینان از صحت اطلاعات
+         matchesSha = null;
+     }
+
+     // Prompt user for next action
+     if (confirm("دسترسی مدیریت برقرار شد.\n\nبرای ثبت نتیجه جدید OK و برای مدیریت تاریخچه CANCEL را بزنید.")) {
+         showRegistrationModal();
+     } else {
+         showAdminOptionsModal();
+     }
+}
         
         function showAdminOptionsModal() {
              // Admin check already happened in showAdminOptions, but we check again for safety
