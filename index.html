@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS App V3.6 - English, First Interaction Music, No Team Icons</title>
+    <title>HARFS App V3.9 </title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
@@ -91,7 +91,7 @@
             background-color: #3b82f6; 
         }
 
-        /* --- Screens (Player/League) --- */
+        /* --- Screens (Player/League/Chat) --- */
         .page-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40;
             display: none; flex-direction: column; justify-content: flex-start; align-items: center;
@@ -102,6 +102,159 @@
             overflow-y: auto;
         }
         
+        /* --- Chat Coach Styles --- */
+        #chat-coach-view {
+            justify-content: flex-start; /* Start from top */
+            padding-top: 20px;
+            padding-bottom: 20px;
+            height: 100%;
+        }
+        .chat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Take full height of its parent */
+            max-height: calc(100vh - 100px); /* Adjust based on padding and back button */
+            position: relative; /* For overlay positioning */
+        }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .chat-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid var(--secondary-color);
+        }
+        .chat-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #e0e7ff;
+        }
+        .chat-messages {
+            flex-grow: 1; /* Take all available space */
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 10px; /* For scrollbar */
+            filter: blur(2px); /* Blurred effect behind overlay */
+            pointer-events: none; /* Disable interaction with blurred content */
+        }
+        .message {
+            margin-bottom: 10px;
+            display: flex;
+        }
+        .message.user {
+            justify-content: flex-end;
+        }
+        .message.coach {
+            justify-content: flex-start;
+        }
+        .message-bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            line-height: 1.4;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        .message.user .message-bubble {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        .message.coach .message-bubble {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #e0e7ff;
+            border-bottom-left-radius: 5px;
+        }
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            filter: blur(2px); /* Blurred effect behind overlay */
+            pointer-events: none; /* Disable interaction with blurred content */
+        }
+        .chat-input-container input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .chat-input-container input:focus {
+            border-color: var(--secondary-color);
+        }
+        .chat-input-container button {
+            background-color: var(--secondary-color);
+            color: var(--dark-bg);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .chat-input-container button:hover {
+            background-color: #3b82f6;
+            transform: scale(1.05);
+        }
+
+        /* Under Development Overlay Styles */
+        #under-development-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 26, 42, 0.8); /* Darker background with transparency */
+            backdrop-filter: blur(12px); /* Stronger blur for the overlay itself */
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 60; /* Above chat elements, below back button */
+            pointer-events: all; /* Allow interaction with the overlay itself */
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5); /* Inner shadow for depth */
+        }
+        .dev-icon {
+            font-size: 5rem; /* Larger icon */
+            color: var(--secondary-color); /* Blue color */
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(96, 165, 250, 0.6); /* Soft glow */
+        }
+        .dev-text-main {
+            font-size: 1.8rem; /* Larger text */
+            font-weight: 700;
+            color: #e0e7ff;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .dev-text-sub {
+            font-size: 1rem;
+            color: #a7b7e6;
+            max-width: 80%;
+        }
+
+
         /* --- League Table Styles --- */
         #league-table-screen { padding: 20px 0; }
         .league-header {
@@ -201,9 +354,9 @@
             <h1 class="text-3xl font-bold text-blue-400">Menu</h1>
             
             <div class="menu-grid">
-                <div class="menu-item text-xl font-semibold" onclick="navigate('player')">
-                    <i class="fas fa-music"></i> 
-                    <span>Music Player</span>
+                <div class="menu-item text-xl font-semibold" onclick="navigate('chat')">
+                    <i class="fas fa-comments"></i> 
+                    <span>Chat with Coaches</span>
                 </div>
                 <div class="menu-item text-xl font-semibold" onclick="navigate('league')">
                     <i class="fas fa-futbol"></i> 
@@ -220,17 +373,34 @@
             </div>
         </div>
 
-        <div id="music-player-view" class="page-screen">
-            <h2 class="text-2xl font-bold text-white mb-8">Music Player Page</h2>
-            <div class="p-6 bg-gray-800 rounded-lg text-center w-full max-w-xs">
-                <i class="fas fa-tools text-5xl text-blue-400 mb-4"></i>
-                <p class="text-lg">Under Development...</p>
-                <p class="text-sm text-gray-400 mt-2">This section will be completed soon.</p>
+        <div id="chat-coach-view" class="page-screen">
+            <div class="chat-card">
+                <div class="chat-header">
+                    <img src="https://raw.githubusercontent.com/rzarisfi/HarfsMusic/league-data/coach_placeholder.png" alt="Coach Avatar">
+                    <h3>Chat with Coaches</h3>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message coach">
+                        <div class="message-bubble">
+                            Hello! I'm your AI football coach assistant. Ask me anything about tactics, players, or match analysis.
+                        </div>
+                    </div>
+                    </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chat-input" placeholder="Type your message...">
+                    <button id="send-chat-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+                
+                <div id="under-development-overlay">
+                    <i class="fas fa-wrench dev-icon"></i>
+                    <div class="dev-text-main">Under Development...</div>
+                    <div class="dev-text-sub">This section will be completed soon.</div>
+                </div>
             </div>
-            <button class="mt-10 bg-gray-700 hover:bg-gray-600 p-3 rounded-lg" onclick="navigate('menu')">
+            
+            <button class="mt-5 bg-gray-700 hover:bg-gray-600 p-3 rounded-lg" onclick="navigate('menu')">
                 <i class="fas fa-chevron-left mr-2"></i> Back to Menu
             </button>
-            <audio id="audio" style="display: none;"></audio>
         </div>
         
         <div id="league-table-screen" class="page-screen">
@@ -354,7 +524,7 @@
         const GITHUB_LEAGUE_FILE = "league_data.json";
         const GITHUB_MATCHES_FILE = "match_history.json"; 
         
-        // ⚠️ Admin Password
+        // ⚠️ Admin Password (Placeholder - to be moved to Netlify Function)
         const ADMIN_PASSWORD = "0000"; 
 
         // Global Team List
@@ -375,13 +545,11 @@
             "Red": "Red"
         };
         
-        // Removed TEAM_ICONS definition
-
         let leagueData = {}; 
         let sha = null; 
         let matchHistory = []; 
         let matchesSha = null; 
-        let musicStarted = false; // Flag to track if music has started
+        let backgroundMusicStarted = false; // Flag to track if background music has started
 
         // ----------------------------------------------------
         // *** ADMIN & UI FUNCTIONS ***
@@ -395,7 +563,7 @@
         
         function checkAdminAccess() {
              const password = prompt("Please enter the admin password:");
-             if (password === ADMIN_PASSWORD) {
+             if (password === ADMIN_PASSWORD) { // This will be replaced by Netlify Function call
                  return true;
              }
              alert("Incorrect password.");
@@ -548,21 +716,70 @@
         }
 
         // ----------------------------------------------------
-        // *** MUSIC PLAYER LOGIC (UPDATED FOR FIRST INTERACTION) ***
+        // *** CHAT COACH LOGIC (PLACEHOLDER) ***
         // ----------------------------------------------------
+        
+        // NOTE: Chat input and send button are intentionally blurred and inactive
+        // due to the 'Under Development' overlay.
+        // The JavaScript logic for sending messages is left here for future implementation,
+        // but it will not be triggered while the overlay is active.
+        
+        const chatMessagesDiv = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendChatBtn = document.getElementById('send-chat-btn');
+        
+        function appendMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.classList.add('message-bubble');
+            bubbleDiv.textContent = text;
+            
+            messageDiv.appendChild(bubbleDiv);
+            chatMessagesDiv.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        }
+        
+        function sendChatMessage() {
+            const messageText = chatInput.value.trim();
+            if (messageText === "") return;
+
+            appendMessage('user', messageText);
+            chatInput.value = '';
+
+            // This is where we'll later integrate with the Netlify Function + LLM
+            setTimeout(() => {
+                appendMessage('coach', "I'm thinking about that... This feature is coming soon!");
+            }, 1000);
+        }
+
+        // Event Listeners for Chat (will not be active due to pointer-events: none on blurred content)
+        sendChatBtn.addEventListener('click', sendChatMessage);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+
+
+        // --- Background Music (First Interaction) ---
+        // This handles the *global background music* that plays once on first interaction
+        const backgroundMusic = document.getElementById('background-music');
         function handleFirstInteraction() {
-            if (!musicStarted) {
-                const music = document.getElementById('background-music');
-                if (music) {
-                    music.volume = 0.05; // Set initial volume
-                    music.play().then(() => {
-                        musicStarted = true;
-                        console.log("Background music started on first user interaction.");
+            if (!backgroundMusicStarted) {
+                if (backgroundMusic) {
+                    backgroundMusic.volume = 0.15; // Set initial volume for background music
+                    backgroundMusic.play().then(() => {
+                        backgroundMusicStarted = true;
+                        console.log("Global background music started on first user interaction.");
                     }).catch(error => {
-                        console.error("Failed to play music on first interaction:", error);
+                        console.error("Failed to play global background music on first interaction:", error);
                     });
                 }
-                // Remove event listeners after music starts to avoid re-triggering
+                // Remove event listeners after background music starts
                 document.removeEventListener('click', handleFirstInteraction);
                 document.removeEventListener('keydown', handleFirstInteraction);
             }
@@ -591,9 +808,10 @@
                     targetScreen.style.display = 'flex';
                     setTimeout(() => targetScreen.classList.add('active'), 50);
                     break;
-                case 'player':
-                    targetScreen = document.getElementById('music-player-view');
+                case 'chat':
+                    targetScreen = document.getElementById('chat-coach-view');
                     targetScreen.style.display = 'flex';
+                    // The overlay is always present in this version
                     break;
                 case 'league':
                     targetScreen = document.getElementById('league-table-screen');
@@ -624,7 +842,6 @@
         
         function startApp() {
             const SPLASH_DURATION_MS = 2000; 
-            const harfsText = document.getElementById('harfs-text');
             
             setTimeout(() => {
                 const splashScreen = document.getElementById('splash-screen');
@@ -634,7 +851,6 @@
                     splashScreen.style.display = 'none'; 
                     document.getElementById('app-container').classList.remove('hidden');
                     navigate('menu'); 
-                    // No setupBackgroundMusic() here. Handled by first interaction.
                 }, 1000);
             }, SPLASH_DURATION_MS);
         }
@@ -1014,4 +1230,3 @@
     </script>
 </body>
 </html>
-
