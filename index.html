@@ -1,195 +1,194 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS App V3.2 - Secure Admin & League Build</title>
+    <title>HARFS App V3.6 - English, First Interaction Music, No Team Icons</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
     
-    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script> 
-    
-   <style>
-    /* Base Styles & Variables */
-    :root {
-        --primary-color: #7c3aed; /* Updated: Purple-500 for better contrast */
-        --secondary-color: #a78bfa; /* Updated: Purple-400 */
-        --glass-bg: rgba(255, 255, 255, 0.08); /* Slightly less opaque */
-        --dark-bg: #121212; /* Very Dark Background */
-        --shadow-color: rgba(0, 0, 0, 0.4);
-    }
+    <style>
+        /* Base Styles & Variables */
+        :root {
+            --primary-color: #1e3a8a; /* Darker Blue-800 */
+            --secondary-color: #60a5fa; /* Lighter Blue-400 */
+            --dark-bg: #0d1a2a; /* Very Dark Navy Blue Background */
+            --glass-bg: rgba(255, 255, 255, 0.08); 
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
 
-    body {
-        font-family: 'Vazirmatn', sans-serif;
-        color: #fff;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        /* --- CHANGE 1: Subtle Gradient Background --- */
-        background: radial-gradient(circle at top, #2d1045 0%, #121212 100%);
-        direction: ltr; 
-        overflow: hidden;
-        padding: 0; 
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Changed to a common English font */
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top, #1c3b5c 0%, #0d1a2a 100%);
+            direction: ltr; /* Changed to LTR for English */
+            overflow: hidden;
+            padding: 0; 
+        }
 
-    /* --- Global App Container (No Change) --- */
-    .app-container {
-        width: 100%; max-width: 380px; height: 100vh; position: relative; overflow: hidden; padding: 0 20px;
-        display: flex; flex-direction: column; justify-content: center; align-items: center;
-    }
+        /* --- Global App Container --- */
+        .app-container {
+            width: 100%; max-width: 380px; height: 100vh; position: relative; overflow: hidden; padding: 0 20px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
 
-    /* --- Splash Screen --- */
-#splash-screen {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--dark-bg); z-index: 100;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    transition: opacity 1s ease-out;
-}
-/* 👇 تغییرات از اینجا شروع می‌شود 👇 */
-.splash-text {
-    font-size: 3rem; font-weight: 700; letter-spacing: 5px; color: white;
-    /* اعمال انیمیشن تپش نرم */
-    animation: pulse 1.5s infinite alternate; 
-}
+        /* --- Splash Screen (Smooth Pulse Animation) --- */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--dark-bg); z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 1s ease-out;
+        }
+        .splash-text {
+            font-size: 3rem; font-weight: 700; letter-spacing: 5px; color: white;
+            animation: pulse 1.5s infinite alternate; 
+        }
+        
+        @keyframes pulse { 
+            0% { opacity: 0.3; } 
+            50% { opacity: 1; } 
+            100% { opacity: 0.3; } 
+        }
+        
+        /* --- Menu Screen --- */
+        #menu-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s; opacity: 0; background: transparent; direction: ltr; /* Changed to LTR */
+        }
+        #menu-screen.active { display: flex; opacity: 1; }
+        .menu-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 400px; margin-top: 30px;
+        }
+        /* Enhanced Menu Items (Soft UI Look) */
+        .menu-item {
+            padding: 20px; border-radius: 15px; 
+            background: #1e1e1e; 
+            backdrop-filter: blur(10px);
+            cursor: pointer; 
+            transition: background 0.2s, transform 0.2s, box-shadow 0.3s; 
+            text-align: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px;
+            box-shadow: 5px 5px 15px var(--shadow-color), -5px -5px 15px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+        }
+        .menu-item:hover { 
+            background: #252525; 
+            transform: scale(1.05); 
+            box-shadow: 0 0 25px var(--primary-color); 
+        }
+        .menu-item i { font-size: 3rem; margin-bottom: 10px; color: var(--secondary-color); }
+        
+        /* Specific Admin Item Style */
+        .menu-item.admin-item {
+            background-color: #1e3a8a; 
+            border: 1px solid var(--primary-color);
+        }
+        .menu-item.admin-item:hover {
+            background-color: #3b82f6; 
+        }
 
-/* تعریف انیمیشن تپش نرم */
-@keyframes pulse { 
-    0% { opacity: 0.3; } 
-    50% { opacity: 1; } 
-    100% { opacity: 0.3; } 
-}
-/* 👆 تغییرات تا اینجا است 👆 */
-    
-    /* --- Menu Screen (No Change) --- */
-    #menu-screen {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
-        display: none; flex-direction: column; justify-content: center; align-items: center;
-        transition: opacity 0.5s; opacity: 0; background: transparent; direction: rtl;
-    }
-    #menu-screen.active { display: flex; opacity: 1; }
-    .menu-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 400px; margin-top: 30px;
-    }
-    
-    /* --- CHANGE 2: Enhanced Menu Items (Soft UI Look) --- */
-    .menu-item {
-        padding: 20px; border-radius: 15px; 
-        background: #1e1e1e; /* Darker solid color */
-        backdrop-filter: blur(10px);
-        cursor: pointer; 
-        transition: background 0.2s, transform 0.2s, box-shadow 0.3s; 
-        text-align: center;
-        display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px;
-        box-shadow: 5px 5px 15px var(--shadow-color), -5px -5px 15px rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.05); /* Subtle border */
-    }
-    .menu-item:hover { 
-        background: #252525; 
-        transform: scale(1.05); 
-        box-shadow: 0 0 25px var(--primary-color); /* Glow on hover */
-    }
-    .menu-item i { font-size: 3rem; margin-bottom: 10px; color: var(--secondary-color); }
-    
-    /* Specific Admin Item Style */
-    .menu-item.admin-item {
-        background-color: #3b0764; /* Even darker Purple for Admin */
-        border: 1px solid var(--primary-color);
-    }
-    .menu-item.admin-item:hover {
-        background-color: #5b21b6; 
-    }
+        /* --- Screens (Player/League) --- */
+        .page-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40;
+            display: none; flex-direction: column; justify-content: flex-start; align-items: center;
+            background: transparent; 
+            direction: ltr; /* Changed to LTR */
+            padding: 20px 0; 
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        
+        /* --- League Table Styles --- */
+        #league-table-screen { padding: 20px 0; }
+        .league-header {
+            direction: ltr; /* Changed to LTR */
+            text-align: left; /* Changed to Left */
+            width: 100%; padding: 0 10px; margin-bottom: 20px;
+            position: sticky; top: 0; z-index: 10; 
+            background: var(--dark-bg); 
+            padding-top: 10px; 
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+        }
+        .league-table-container {
+            direction: ltr; /* Changed to LTR */
+            width: 100%; 
+            padding: 0 10px;
+            border-radius: 10px; 
+            overflow: hidden; 
+        }
+        
+        .team-header { 
+            font-weight: bold; 
+            background: #1e3a8a; 
+            padding: 10px 0; 
+            text-align: center; 
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        /* Alternate Row Colors and Hover */
+        .team-row {
+            display: grid; 
+            grid-template-columns: 0.3fr 1.8fr repeat(4, 0.6fr) repeat(3, 0.7fr) 0.8fr; 
+            padding: 10px 0; font-size: 0.8rem; 
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .team-row:nth-child(even) {
+            background-color: #15273b; 
+        }
+        .team-row:nth-child(odd) {
+            background-color: #1a2f4a; 
+        }
+        .team-row:hover {
+            background-color: #254b73; 
+        }
 
-    /* --- Screens (Player/League) --- */
-    .page-screen {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40;
-        display: none; flex-direction: column; justify-content: flex-start; align-items: center;
-        background: transparent; /* Changed to transparent to show body gradient */
-        direction: rtl;
-        padding: 20px 0; 
-        box-sizing: border-box;
-        overflow-y: auto;
-    }
-    
-    /* --- League Table Styles --- */
-    #league-table-screen { padding: 20px 0; }
-    .league-header {
-        direction: rtl; text-align: right; width: 100%; padding: 0 10px; margin-bottom: 20px;
-        position: sticky; top: 0; z-index: 10; 
-        background: var(--dark-bg); 
-        padding-top: 10px; 
-        box-shadow: 0 5px 10px rgba(0,0,0,0.5);
-    }
-    .league-table-container {
-        direction: rtl; 
-        width: 100%; 
-        padding: 0 10px;
-        /* --- CHANGE 3: Border Radius for Table --- */
-        border-radius: 10px; 
-        overflow: hidden; /* Important for table border radius */
-    }
-    
-    .team-header { 
-        font-weight: bold; 
-        background: #3a1b5c; /* Darker header color */
-        padding: 10px 0; 
-        text-align: center; 
-        border-bottom: 2px solid var(--primary-color);
-    }
-    
-    /* --- CHANGE 3: Alternate Row Colors for Readability --- */
-    .team-row {
-        /* 10 columns: # | Team | P | W | D | L | GF | GA | GD | Pts */
-        display: grid; 
-        grid-template-columns: 0.3fr 1.8fr repeat(4, 0.6fr) repeat(3, 0.7fr) 0.8fr; 
-        padding: 10px 0; font-size: 0.8rem; 
-        align-items: center;
-        transition: background 0.2s;
-    }
-    .team-row:nth-child(even) {
-        background-color: #202020; /* Slightly darker grey */
-    }
-    .team-row:nth-child(odd) {
-        background-color: #282828; /* Base row color */
-    }
-    .team-row:hover {
-        background-color: #3b0764; /* Highlight color on hover */
-    }
+        .team-name { 
+            font-weight: 600; 
+            text-align: left; /* Changed to Left */
+            overflow: hidden; 
+            white-space: nowrap; 
+            text-overflow: ellipsis;
+            justify-content: flex-start; /* Changed to flex-start */
+        }
+        .team-pts { font-weight: bold; color: #ffeb3b; font-size: 1rem; } 
+        .team-rank { font-weight: 700; color: #60a5fa; text-align: center; }
 
-    .team-name { font-weight: 600; text-align: right; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
-    .team-pts { font-weight: bold; color: #ffeb3b; font-size: 1rem; } /* Changed to yellow for points */
-    .team-rank { font-weight: 700; color: #a78bfa; text-align: center; }
-
-    /* Match Registration Modal (No Major Change) */
-    #match-registration-modal {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85);
-        z-index: 1000; display: none; align-items: center; justify-content: center;
-    }
-    
-    /* Admin Options Modal CSS (No Major Change) */
-    #admin-options-modal {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9);
-        z-index: 2000; display: none; align-items: center; justify-content: center;
-    }
-    #admin-options-modal .modal-content {
-        background: #282828; padding: 20px; border-radius: 15px; width: 95%; max-width: 500px;
-        direction: rtl; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
-    }
-    .admin-match-item {
-         display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .modal-content {
-        background: #282828; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px;
-        direction: rtl; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-    }
-    
-    .modal-content select, .modal-content input[type="number"] {
-        color: #1a1a1a !important; 
-        background-color: #f0f0f0; 
-        border: none;
-    }
-</style>
+        /* Modal Styles (No Major Change) */
+        #match-registration-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+        }
+        
+        #admin-options-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+        }
+        #admin-options-modal .modal-content {
+            background: #282828; padding: 20px; border-radius: 15px; width: 95%; max-width: 500px;
+            direction: ltr; /* Changed to LTR */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+        }
+        .admin-match-item {
+             display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-content {
+            background: #282828; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px;
+            direction: ltr; /* Changed to LTR */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+        
+        .modal-content select, .modal-content input[type="number"] {
+            color: #1a1a1a !important; 
+            background-color: #f0f0f0; 
+            border: none;
+        }
+    </style>
 </head>
 <body>
     <div id="splash-screen">
@@ -199,7 +198,7 @@
     <div class="app-container hidden" id="app-container">
         
         <div id="menu-screen">
-            <h1 class="text-3xl font-bold text-purple-400">HARFS</h1>
+            <h1 class="text-3xl font-bold text-blue-400">Menu</h1>
             
             <div class="menu-grid">
                 <div class="menu-item text-xl font-semibold" onclick="navigate('player')">
@@ -208,113 +207,113 @@
                 </div>
                 <div class="menu-item text-xl font-semibold" onclick="navigate('league')">
                     <i class="fas fa-futbol"></i> 
-                    <span>جدول لیگ</span>
+                    <span>League Table</span>
                 </div>
                 <div class="menu-item text-xl font-semibold" onclick="navigate('history')">
                     <i class="fas fa-history"></i> 
-                    <span>تاریخچه بازی‌ها</span>
+                    <span>Match History</span>
                 </div>
                 <div class="menu-item admin-item text-xl font-semibold" onclick="showAdminOptions()">
                     <i class="fas fa-user-shield"></i> 
-                    <span>پنل ادمین (ثبت/مدیریت)</span>
+                    <span>Admin Panel (Register/Manage)</span>
                 </div>
             </div>
         </div>
 
         <div id="music-player-view" class="page-screen">
-            <h2 class="text-2xl font-bold text-white mb-8">صفحه پخش کننده موسیقی</h2>
+            <h2 class="text-2xl font-bold text-white mb-8">Music Player Page</h2>
             <div class="p-6 bg-gray-800 rounded-lg text-center w-full max-w-xs">
-                <i class="fas fa-tools text-5xl text-purple-400 mb-4"></i>
-                <p class="text-lg">در حال توسعه...</p>
-                <p class="text-sm text-gray-400 mt-2">این بخش به زودی تکمیل خواهد شد.</p>
+                <i class="fas fa-tools text-5xl text-blue-400 mb-4"></i>
+                <p class="text-lg">Under Development...</p>
+                <p class="text-sm text-gray-400 mt-2">This section will be completed soon.</p>
             </div>
             <button class="mt-10 bg-gray-700 hover:bg-gray-600 p-3 rounded-lg" onclick="navigate('menu')">
-                <i class="fas fa-chevron-right ml-2"></i> بازگشت به منو
+                <i class="fas fa-chevron-left mr-2"></i> Back to Menu
             </button>
             <audio id="audio" style="display: none;"></audio>
         </div>
         
         <div id="league-table-screen" class="page-screen">
             <div class="league-header">
-                <div class="flex justify-start items-center mb-4">
+                <div class="flex justify-between items-center mb-4">
                     <button class="text-gray-400 hover:text-white text-xl" onclick="navigate('menu')">
-                        <i class="fas fa-chevron-right"></i> بازگشت
+                        <i class="fas fa-chevron-left mr-2"></i> Back
                     </button>
+                    <h2 class="text-2xl font-bold text-center text-blue-300">Complete League Table</h2>
                 </div>
                 
-                <h2 class="text-2xl font-bold text-center text-purple-300 mb-1">جدول لیگ</h2>
                 <div class="text-center text-sm text-gray-400" id="current-datetime">Loading...</div>
                 
                 <div class="team-row team-header text-center mt-4">
                     <div>#</div>
-                    <div class="team-name">تیم</div>
-                    <div>بازی</div>
-                    <div>برد</div>
-                    <div>مساوی</div>
-                    <div>باخت</div>
-                    <div>زده</div> 
-                    <div>خورده</div>
-                    <div>تفاضل</div>
-                    <div class="team-pts">امتیاز</div>
+                    <div class="team-name">Team</div>
+                    <div>P</div>
+                    <div>W</div>
+                    <div>D</div>
+                    <div>L</div>
+                    <div>GF</div> 
+                    <div>GA</div>
+                    <div>GD</div>
+                    <div class="team-pts">Pts</div>
                 </div>
             </div>
             
             <div class="league-table-container mt-1">
                 <div id="league-table-body">
                     </div>
-                <div id="loading-message" class="text-center text-gray-500 mt-10">در حال بارگذاری اطلاعات لیگ...</div>
+                <div id="loading-message" class="text-center text-gray-500 mt-10">Loading league data...</div>
             </div>
         </div>
         
         <div id="match-history-screen" class="page-screen">
             <div class="league-header">
-                <div class="flex justify-start items-center mb-4">
+                <div class="flex justify-between items-center mb-4">
                     <button class="text-gray-400 hover:text-white text-xl" onclick="navigate('menu')">
-                        <i class="fas fa-chevron-right"></i> بازگشت
+                        <i class="fas fa-chevron-left mr-2"></i> Back
                     </button>
-                    <h2 class="text-2xl font-bold text-center text-purple-300 mr-4">تاریخچه کامل بازی‌ها</h2>
+                    <h2 class="text-2xl font-bold text-center text-blue-300">Complete Match History</h2>
                 </div>
             </div>
             
             <div class="w-full px-4">
                 <div id="history-list" class="flex flex-col gap-3">
-                    <div id="history-loading" class="text-center text-gray-500 mt-10">در حال بارگذاری تاریخچه...</div>
+                    <div id="history-loading" class="text-center text-gray-500 mt-10">Loading history...</div>
                 </div>
             </div>
         </div>
         
         <div id="match-registration-modal">
             <div class="modal-content">
-                <h3 class="text-xl font-bold mb-4 text-purple-400">ثبت نتیجه بازی</h3>
+                <h3 class="text-xl font-bold mb-4 text-blue-400">Register Match Result</h3>
                 
                 <div class="flex justify-between items-center mb-4 text-center">
                     <div class="w-2/5">
-                        <label class="block mb-1 text-sm font-semibold">تیم میزبان:</label>
+                        <label class="block mb-1 text-sm font-semibold">Home Team:</label>
                         <select id="home-team-select" class="w-full p-2 text-black rounded"></select>
                     </div>
                     <div class="w-1/5">
-                        <label class="block mb-1 text-sm font-semibold">گل:</label>
+                        <label class="block mb-1 text-sm font-semibold">Score:</label>
                         <input type="number" id="home-score" class="w-full p-2 text-black rounded text-center" value="0" min="0">
                     </div>
                     <span class="text-2xl pt-6 px-1">-</span>
                     <div class="w-1/5">
-                        <label class="block mb-1 text-sm font-semibold">گل:</label>
+                        <label class="block mb-1 text-sm font-semibold">Score:</label>
                         <input type="number" id="away-score" class="w-full p-2 text-black rounded text-center" value="0" min="0">
                     </div>
                     <div class="w-2/5">
-                        <label class="block mb-1 text-sm font-semibold">تیم میهمان:</label>
+                        <label class="block mb-1 text-sm font-semibold">Away Team:</label>
                         <select id="away-team-select" class="w-full p-2 text-black rounded"></select>
                     </div>
                 </div>
                 
-                <p class="text-xs text-red-400 text-center mb-4" id="modal-error" style="display:none;">تیم میزبان و میهمان باید متفاوت باشند.</p>
+                <p class="text-xs text-red-400 text-center mb-4" id="modal-error" style="display:none;">Home and Away teams must be different.</p>
 
                 <div class="flex justify-end mt-4">
                     <button class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg ml-2" onclick="hideRegistrationModal()">
-                        انصراف
+                        Cancel
                     </button>
                     <button class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg" onclick="registerMatchResult()">
-                        ثبت نهایی و ذخیره
+                        Save & Register
                     </button>
                 </div>
             </div>
@@ -322,24 +321,29 @@
         
         <div id="admin-options-modal">
             <div class="modal-content">
-                <h3 class="text-xl font-bold mb-4 text-purple-400">پنل مدیریت بازی‌ها</h3>
+                <h3 class="text-xl font-bold mb-4 text-blue-400">Match Management Panel</h3>
                 
                 <div id="admin-history-list" class="max-h-80 overflow-y-auto mb-4 p-2 bg-gray-700 rounded-lg">
-                    <div class="text-center text-gray-400">در حال بارگذاری...</div>
+                    <div class="text-center text-gray-400">Loading...</div>
                 </div>
 
                 <div class="flex justify-end mt-4">
                     <button class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg ml-2" onclick="hideAdminOptionsModal()">
-                        بستن
+                        Close
                     </button>
                     <button class="bg-yellow-600 hover:bg-yellow-700 text-white p-2 rounded-lg" onclick="resetLeagueConfirm()">
-                        <i class="fas fa-undo mr-1"></i> بازنشانی کامل لیگ
+                        <i class="fas fa-undo mr-1"></i> Reset League
                     </button>
                 </div>
             </div>
         </div>
 
     </div>
+
+    <audio id="background-music" loop style="display: none;">
+        <source src="https://raw.githubusercontent.com/rzarisfi/HarfsMusic/league-data/HARFS_background.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
     <script>
         // ----------------------------------------------------
@@ -350,10 +354,10 @@
         const GITHUB_LEAGUE_FILE = "league_data.json";
         const GITHUB_MATCHES_FILE = "match_history.json"; 
         
-        // ⚠️ رمز عبور ادمین
-        const ADMIN_PASSWORD = "0000"; 
+        // ⚠️ Admin Password
+        const ADMIN_PASSWORD = "harfsadmin123"; 
 
-        // Global Team List (English keys)
+        // Global Team List
         const TEAM_NAMES = [
             "Real_Madrid", 
             "Barcelona", 
@@ -362,19 +366,22 @@
             "Red"
         ];
         
-        // Display Names (For UI rendering only - Persian names)
+        // Display Names (English)
         const TEAM_DISPLAY_NAMES = {
-            "Real_Madrid": "رئال مادرید",
-            "Barcelona": "بارسلونا",
-            "Bayern_Munich": "بایرن مونیخ",
-            "Blue": "آبی",
-            "Red": "قرمز"
+            "Real_Madrid": "Real Madrid",
+            "Barcelona": "Barcelona",
+            "Bayern_Munich": "Bayern Munich",
+            "Blue": "Blue",
+            "Red": "Red"
         };
         
+        // Removed TEAM_ICONS definition
+
         let leagueData = {}; 
         let sha = null; 
         let matchHistory = []; 
         let matchesSha = null; 
+        let musicStarted = false; // Flag to track if music has started
 
         // ----------------------------------------------------
         // *** ADMIN & UI FUNCTIONS ***
@@ -387,46 +394,41 @@
         }
         
         function checkAdminAccess() {
-             const password = prompt("لطفاً رمز عبور مدیریت را وارد کنید:");
+             const password = prompt("Please enter the admin password:");
              if (password === ADMIN_PASSWORD) {
                  return true;
              }
-             alert("رمز عبور اشتباه است.");
+             alert("Incorrect password.");
              return false;
         }
         
-        // NEW: Handles the main menu admin button click
-        // Handles the main menu admin button click
-function showAdminOptions() {
-     if (!checkAdminAccess()) return; // اولین مرحله: چک کردن رمز ادمین
+        // Handles the main menu admin button click (UPDATED for PAT prompt)
+        function showAdminOptions() {
+             if (!checkAdminAccess()) return; 
 
-     let TOKEN = localStorage.getItem('github_pat');
+             let TOKEN = localStorage.getItem('github_pat');
 
-     if (!TOKEN) {
-         // اگر توکن موجود نیست، از کاربر بخواهید آن را وارد کند.
-         TOKEN = prompt("برای ثبت و مدیریت داده‌ها، به GitHub Personal Access Token (PAT) نیاز است. لطفاً آن را وارد کنید:");
-         if (!TOKEN) {
-              alert("عملیات لغو شد. بدون توکن، امکان ثبت یا مدیریت بازی‌ها وجود ندارد.");
-              return;
-         }
-         localStorage.setItem('github_pat', TOKEN);
-         sha = null; // ریست SHA برای اطمینان از صحت اطلاعات
-         matchesSha = null;
-     }
+             if (!TOKEN) {
+                 TOKEN = prompt("A GitHub Personal Access Token (PAT) is required for saving data. Please enter it:");
+                 if (!TOKEN) {
+                      alert("Operation canceled. Cannot register or manage games without a token.");
+                      return;
+                 }
+                 localStorage.setItem('github_pat', TOKEN);
+                 sha = null; 
+                 matchesSha = null;
+             }
 
-     // Prompt user for next action
-     if (confirm("دسترسی مدیریت برقرار شد.\n\nبرای ثبت نتیجه جدید OK و برای مدیریت تاریخچه CANCEL را بزنید.")) {
-         showRegistrationModal();
-     } else {
-         showAdminOptionsModal();
-     }
-}
+             if (confirm("Admin access granted.\n\nClick OK to register a new result, or CANCEL to manage match history.")) {
+                 showRegistrationModal();
+             } else {
+                 showAdminOptionsModal();
+             }
+        }
         
         function showAdminOptionsModal() {
-             // Admin check already happened in showAdminOptions, but we check again for safety
              if (document.getElementById('admin-options-modal').style.display === 'flex') return;
              
-             // Refresh history data for management
              loadMatchHistoryFromGitHub().then(history => {
                  renderAdminHistory(history);
                  document.getElementById('admin-options-modal').style.display = 'flex';
@@ -438,7 +440,6 @@ function showAdminOptions() {
         }
         
         function showRegistrationModal() { 
-             // Admin check already happened in showAdminOptions
              document.getElementById('home-score').value = 0;
              document.getElementById('away-score').value = 0;
              document.getElementById('modal-error').style.display = 'none';
@@ -473,36 +474,32 @@ function showAdminOptions() {
         }
         
         async function deleteMatch(index) {
-             if (!confirm("آیا مطمئن هستید که می‌خواهید این بازی را حذف کنید؟ این عمل غیرقابل بازگشت است.")) return;
+             if (!confirm("Are you sure you want to delete this match? This action cannot be undone.")) return;
              
-             // 1. Remove the match from local history
              matchHistory.splice(index, 1);
              
-             // 2. Save the new history array to GitHub
              const successHistory = await saveMatchHistoryToGitHub(matchHistory, `Admin: Deleted match at index ${index}`);
 
              if (successHistory) {
-                 // 3. Recalculate all league stats from the updated history
                  recalculateLeagueFromHistory();
                  
-                 // 4. Save the new league stats to GitHub
                  const successLeague = await saveLeagueDataToGitHub(leagueData, 'Admin: Recalculated league stats after deletion.');
                  
                  if (successLeague) {
-                     alert("بازی با موفقیت حذف و جدول لیگ بازنشانی شد.");
+                     alert("Match deleted successfully and league table reset.");
                      hideAdminOptionsModal();
-                     navigate('league'); // رفرش جدول
+                     navigate('league'); 
                  } else {
-                     alert("خطا در ذخیره‌سازی آمار لیگ پس از حذف. لطفاً توکن گیت‌هاب را بررسی کنید.");
+                     alert("Error saving league stats after deletion. Please check your GitHub token.");
                  }
              } else {
-                 alert("خطا در حذف بازی از تاریخچه گیت‌هاب.");
+                 alert("Error deleting match from GitHub history.");
              }
         }
         
         async function resetLeagueConfirm() {
-             if (!confirm("هشدار! آیا مطمئن هستید که می‌خواهید تمام نتایج و تاریخچه را حذف کنید؟ این عمل غیرقابل بازگشت است!")) return;
-             if (!confirm("اخطار نهایی: با کلیک بر روی OK، تمام آمار لیگ پاک می‌شود. ادامه می‌دهید؟")) return;
+             if (!confirm("WARNING! Are you sure you want to delete all match results and history? This action cannot be undone!")) return;
+             if (!confirm("FINAL WARNING: Clicking OK will wipe all league statistics. Do you wish to continue?")) return;
 
              matchHistory = [];
              resetLeagueStats();
@@ -511,20 +508,20 @@ function showAdminOptions() {
              const successLeague = await saveLeagueDataToGitHub(leagueData, 'Admin: Full league reset.');
 
              if (successHistory && successLeague) {
-                 alert("لیگ به طور کامل بازنشانی شد.");
+                 alert("League has been completely reset.");
                  hideAdminOptionsModal();
-                 navigate('league'); // رفرش جدول
+                 navigate('league'); 
              } else {
-                 alert("خطا در بازنشانی لیگ. توکن گیت‌هاب را بررسی کنید.");
+                 alert("Error resetting league. Please check your GitHub token.");
              }
         }
         
         function renderAdminHistory(history) {
-             matchHistory = history || matchHistory; // Update local history
+             matchHistory = history || matchHistory; 
              const historyListElement = document.getElementById('admin-history-list');
 
              if (matchHistory.length === 0) {
-                 historyListElement.innerHTML = '<div class="text-center text-gray-400 p-4">هنوز بازی ثبت نشده است.</div>';
+                 historyListElement.innerHTML = '<div class="text-center text-gray-400 p-4">No matches registered yet.</div>';
                  return;
              }
 
@@ -535,12 +532,12 @@ function showAdminOptions() {
                  return `
                     <div class="admin-match-item hover:bg-gray-600 transition duration-150 rounded">
                         <span class="font-semibold text-white text-sm">
-                             ${homeName} <span class="text-purple-300 mx-1">${match.score}</span> ${awayName}
+                             ${homeName} <span class="text-blue-300 mx-1">${match.score}</span> ${awayName}
                         </span>
                         <div>
                              <button class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs" 
                                      onclick="deleteMatch(${index})">
-                                 <i class="fas fa-trash"></i> حذف
+                                 <i class="fas fa-trash"></i> Delete
                              </button>
                         </div>
                     </div>
@@ -549,6 +546,32 @@ function showAdminOptions() {
              
              historyListElement.innerHTML = historyHtml;
         }
+
+        // ----------------------------------------------------
+        // *** MUSIC PLAYER LOGIC (UPDATED FOR FIRST INTERACTION) ***
+        // ----------------------------------------------------
+        function handleFirstInteraction() {
+            if (!musicStarted) {
+                const music = document.getElementById('background-music');
+                if (music) {
+                    music.volume = 0.05; // Set initial volume
+                    music.play().then(() => {
+                        musicStarted = true;
+                        console.log("Background music started on first user interaction.");
+                    }).catch(error => {
+                        console.error("Failed to play music on first interaction:", error);
+                    });
+                }
+                // Remove event listeners after music starts to avoid re-triggering
+                document.removeEventListener('click', handleFirstInteraction);
+                document.removeEventListener('keydown', handleFirstInteraction);
+            }
+        }
+        
+        // Add event listeners for the first click or keydown
+        document.addEventListener('click', handleFirstInteraction);
+        document.addEventListener('keydown', handleFirstInteraction);
+
 
         // ----------------------------------------------------
         // *** CORE APP & NAVIGATION LOGIC ***
@@ -585,7 +608,7 @@ function showAdminOptions() {
                         })
                         .catch(error => {
                             console.error("Error loading league data on navigation:", error);
-                            document.getElementById('loading-message').textContent = "خطا در بارگذاری داده‌ها. مطمئن شوید فایل‌های JSON در گیت‌هاب موجود هستند.";
+                            document.getElementById('loading-message').textContent = "Error loading data. Ensure JSON files exist on GitHub.";
                             renderLeagueTable(leagueData);
                         });
                     break;
@@ -602,9 +625,6 @@ function showAdminOptions() {
         function startApp() {
             const SPLASH_DURATION_MS = 2000; 
             const harfsText = document.getElementById('harfs-text');
-            harfsText.classList.remove('splash-text');
-            void harfsText.offsetWidth; 
-            harfsText.classList.add('splash-text');
             
             setTimeout(() => {
                 const splashScreen = document.getElementById('splash-screen');
@@ -614,6 +634,7 @@ function showAdminOptions() {
                     splashScreen.style.display = 'none'; 
                     document.getElementById('app-container').classList.remove('hidden');
                     navigate('menu'); 
+                    // No setupBackgroundMusic() here. Handled by first interaction.
                 }, 1000);
             }, SPLASH_DURATION_MS);
         }
@@ -640,20 +661,28 @@ function showAdminOptions() {
              
              document.getElementById('loading-message').style.display = 'none';
 
-             tableBody.innerHTML = calculatedTable.map((team, index) => `
-                <div class="team-row text-center hover:bg-gray-800 transition duration-150">
-                    <div class="team-rank">${index + 1}</div>
-                    <div class="team-name text-right pr-2">${TEAM_DISPLAY_NAMES[team.name] || team.name}</div>
-                    <div>${team.P}</div>
-                    <div>${team.W}</div>
-                    <div>${team.D}</div>
-                    <div>${team.L}</div>
-                    <div>${team.GF}</div> 
-                    <div>${team.GA}</div>
-                    <div class="font-bold">${team.GF - team.GA}</div> 
-                    <div class="team-pts">${team.Pts}</div>
-                </div>
-             `).join('');
+             tableBody.innerHTML = calculatedTable.map((team, index) => {
+                 const displayName = TEAM_DISPLAY_NAMES[team.name] || team.name;
+
+                 return `
+                    <div class="team-row text-center hover:bg-gray-800 transition duration-150">
+                        <div class="team-rank">${index + 1}</div>
+                        
+                        <div class="team-name text-left pl-2">
+                            <span>${displayName}</span>
+                        </div>
+                        
+                        <div>${team.P}</div>
+                        <div>${team.W}</div>
+                        <div>${team.D}</div>
+                        <div>${team.L}</div>
+                        <div>${team.GF}</div> 
+                        <div>${team.GA}</div>
+                        <div class="font-bold">${team.GF - team.GA}</div> 
+                        <div class="team-pts">${team.Pts}</div>
+                    </div>
+                 `;
+             }).join('');
              
              // Populate team selectors
              const homeSelect = document.getElementById('home-team-select');
@@ -697,27 +726,24 @@ function showAdminOptions() {
                 return;
             }
             if (isNaN(homeScore) || isNaN(awayScore) || homeScore < 0 || awayScore < 0) {
-                 alert("لطفاً نتایج گل‌ها را به درستی وارد کنید.");
+                 alert("Please enter valid scores.");
                  return;
             }
             
             const displayHomeName = TEAM_DISPLAY_NAMES[homeTeamName] || homeTeamName;
             const displayAwayName = TEAM_DISPLAY_NAMES[awayTeamName] || awayTeamName;
 
-            if(confirm(`آیا از ثبت نتیجه ${displayHomeName} ${homeScore} - ${awayScore} ${displayAwayName} اطمینان دارید؟`)){
+            if(confirm(`Are you sure you want to register the result: ${displayHomeName} ${homeScore} - ${awayScore} ${displayAwayName}?`)){
 
-                // Deep copy local data to revert in case of save failure
                 const oldLeagueData = JSON.parse(JSON.stringify(leagueData));
                 const oldMatchHistory = JSON.parse(JSON.stringify(matchHistory));
                 
                 const homeTeam = leagueData[homeTeamName];
                 const awayTeam = leagueData[awayTeamName];
                 
-                // Update stats locally
                 updateTeamStats(homeTeam, homeScore, awayScore);
                 updateTeamStats(awayTeam, awayScore, homeScore);
                 
-                // Prepare match detail for history
                 const matchDetail = {
                     home: homeTeamName,
                     away: awayTeamName,
@@ -726,28 +752,24 @@ function showAdminOptions() {
                 };
                 matchHistory.unshift(matchDetail); 
                 
-                // Save league data first
                 const successLeague = await saveLeagueDataToGitHub(leagueData, `Match Result: ${homeTeamName} ${homeScore}-${awayScore} ${awayTeamName}`);
                 
-                // If league data save was successful, proceed to save history
                 if (successLeague) {
                     const successHistory = await saveMatchHistoryToGitHub(matchHistory, `Add Match: ${matchDetail.score}`);
                     
                     if (successHistory) {
                         hideRegistrationModal();
                         navigate('league');
-                        alert("نتیجه بازی و تاریخچه با موفقیت ثبت و ذخیره شد.");
+                        alert("Match result and history saved successfully.");
                     } else {
-                         // If only history fails, revert both local changes
                         leagueData = oldLeagueData;
                         matchHistory = oldMatchHistory;
-                        alert("خطا در ذخیره‌سازی تاریخچه! توکن گیت‌هاب را بررسی کنید.");
+                        alert("Error saving history! Please check your GitHub token.");
                     }
                 } else {
-                    // If league data save fails, revert local changes
                     leagueData = oldLeagueData;
                     matchHistory = oldMatchHistory;
-                    alert("خطا در ذخیره‌سازی آمار لیگ! توکن گیت‌هاب را بررسی کنید.");
+                    alert("Error saving league stats! Please check your GitHub token.");
                 }
             }
         }
@@ -756,10 +778,10 @@ function showAdminOptions() {
         function renderMatchHistory(history) {
             const historyList = document.getElementById('history-list');
             document.getElementById('history-loading').style.display = 'none';
-            matchHistory = history; // Update local history
+            matchHistory = history; 
 
             if (history.length === 0) {
-                 historyList.innerHTML = '<div class="text-center text-gray-500 mt-5">هنوز بازی ثبت نشده است.</div>';
+                 historyList.innerHTML = '<div class="text-center text-gray-500 mt-5">No matches registered yet.</div>';
                  return;
             }
 
@@ -767,18 +789,19 @@ function showAdminOptions() {
                 const homeName = TEAM_DISPLAY_NAMES[match.home] || match.home;
                 const awayName = TEAM_DISPLAY_NAMES[match.away] || match.away;
                 
-                const date = new persianDate(new Date(match.timestamp)).format('dddd YYYY/MM/DD');
-                const time = new Date(match.timestamp).toLocaleTimeString("fa-IR", { timeZone: "Asia/Tehran", hour: '2-digit', minute: '2-digit', hour12: false });
+                // Using standard date formatting for English UI
+                const date = new Date(match.timestamp).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
+                const time = new Date(match.timestamp).toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', hour12: true });
                 
                 return `
-                    <div class="p-4 bg-gray-800 rounded-lg shadow-md border-r-4 border-purple-500 text-sm">
+                    <div class="p-4 bg-gray-800 rounded-lg shadow-md border-r-4 border-blue-500 text-sm">
                         <div class="font-bold text-center text-lg mb-2">
                             <span>${homeName}</span> 
-                            <span class="text-purple-300 mx-2">${match.score}</span> 
+                            <span class="text-blue-300 mx-2">${match.score}</span> 
                             <span>${awayName}</span>
                         </div>
                         <div class="text-xs text-gray-400 text-center">
-                            <span>تاریخ: ${date}</span> | <span>ساعت: ${time} (تهران)</span>
+                            <span>Date: ${date}</span> | <span>Time: ${time}</span>
                         </div>
                     </div>
                 `;
@@ -788,47 +811,30 @@ function showAdminOptions() {
         }
 
         // ----------------------------------------------------
-        // *** GITHUB API INTERACTION (FINAL FIX) ***
+        // *** GITHUB API INTERACTION ***
         // ----------------------------------------------------
 
         const BASE_API_URL = `https://api.github.com/repos/${GITHUB_REPO}/contents/`;
         
-        // تابع رمزگذاری Base64 سازگار با Unicode/UTF-8
         function b64Encode(str) {
             return btoa(unescape(encodeURIComponent(str)));
         }
 
-        // ✅ فقط در عملیات Write (ثبت یا حذف) فراخوانی می‌شود
         async function getGitHubToken() {
              let TOKEN = localStorage.getItem('github_pat');
-            
-             if (!TOKEN) { 
-                 TOKEN = prompt("لطفاً GitHub Personal Access Token (PAT) جدید خود را وارد کنید (باید مجوز repo داشته باشد):");
-                 if (!TOKEN) {
-                      return null;
-                 }
-                 localStorage.setItem('github_pat', TOKEN); 
-                 // با توکن جدید، SHA ها را برای بارگذاری مجدد از گیت‌هاب، ریست می‌کنیم.
-                 sha = null; 
-                 matchesSha = null;
-                 
-             }
-             return TOKEN;
+             return TOKEN; 
         }
         
-        // Public READ access: بدون نیاز به توکن
         async function loadLeagueDataFromGitHub() {
             if (Object.keys(leagueData).length === 0) { initializeLeagueData(); }
             
             try {
-                // این فراخوانی برای دریافت SHA و URL دانلود است
                 const response = await fetch(`${BASE_API_URL}${GITHUB_LEAGUE_FILE}?ref=${GITHUB_LEAGUE_BRANCH}`);
                 
                 if (response.ok) {
                     const shaData = await response.json();
-                    sha = shaData.sha; // SHA را برای آپدیت بعدی ذخیره می‌کنیم
+                    sha = shaData.sha; 
                     
-                    // فراخوانی مستقیم دانلود URL
                     const fileContentResponse = await fetch(shaData.download_url);
                     const fileContent = await fileContentResponse.json();
                     
@@ -846,23 +852,19 @@ function showAdminOptions() {
                 throw new Error(`Failed to fetch league data: ${response.statusText} (${response.status})`);
             } catch (error) {
                 console.error("Error in loadLeagueDataFromGitHub:", error);
-                // اگر خطایی در بارگذاری رخ داد، مطمئن می‌شویم SHA هم ریست شده است
                 sha = null;
                 return leagueData; 
             }
         }
         
-        // Public READ access: بدون نیاز به توکن
         async function loadMatchHistoryFromGitHub() {
             try {
-                // این فراخوانی برای دریافت SHA و URL دانلود است
                 const response = await fetch(`${BASE_API_URL}${GITHUB_MATCHES_FILE}?ref=${GITHUB_LEAGUE_BRANCH}`);
                 
                 if (response.ok) {
                     const shaData = await response.json();
-                    matchesSha = shaData.sha; // SHA را برای آپدیت بعدی ذخیره می‌کنیم
+                    matchesSha = shaData.sha; 
                     
-                    // فراخوانی مستقیم دانلود URL
                     const fileContentResponse = await fetch(shaData.download_url);
                     matchHistory = await fileContentResponse.json();
                     return matchHistory;
@@ -874,18 +876,16 @@ function showAdminOptions() {
                 throw new Error(`Failed to fetch history: ${response.statusText}`);
             } catch (error) {
                 console.error("Error in loadMatchHistoryFromGitHub:", error);
-                // اگر خطایی در بارگذاری رخ داد، مطمئن می‌شویم SHA هم ریست شده است
                 matchesSha = null;
                 matchHistory = [];
                 return [];
             }
         }
         
-        // 🚨 FINAL SAVE FUNCTION 1 (LEAGUE DATA) - FIX FOR 422 SHA ISSUE
         async function saveLeagueDataToGitHub(data, commitMessage) {
             const TOKEN = localStorage.getItem('github_pat');
             if (!TOKEN) { 
-                alert("عملیات ذخیره‌سازی به دلیل عدم وجود توکن گیت‌هاب لغو شد."); 
+                alert("Save operation canceled due to missing GitHub token."); 
                 return false; 
             }
 
@@ -903,11 +903,8 @@ function showAdminOptions() {
                 branch: GITHUB_LEAGUE_BRANCH 
             };
 
-            // ✅ منطق اصلاح شده: SHA فقط در صورت وجود به درخواست اضافه می‌شود (رفع مشکل 422)
             if (sha) {
                 requestBody.sha = sha;
-            } else {
-                 console.log("First time commit for league data or SHA reset. Attempting to create file.");
             }
             
             try {
@@ -922,18 +919,17 @@ function showAdminOptions() {
 
                 if (response.ok) {
                     const responseData = await response.json();
-                    sha = responseData.content.sha; // SHA جدید را ذخیره می‌کنیم
+                    sha = responseData.content.sha; 
                     return true;
                 } else {
                     const errorText = await response.text();
                     console.error("GitHub League Save Error (Status:", response.status, "):", errorText);
-                    // 🚨 در صورت بروز خطا، SHA را ریست می‌کنیم تا در تلاش بعدی دوباره بارگذاری شود.
                     sha = null; 
                     if(response.status === 401 || response.status === 403) { 
-                        alert("خطا در توکن گیت‌هاب: مجوز کافی نیست یا توکن منقضی شده است. توکن حذف شد.");
+                        alert("GitHub token error: Insufficient permissions or expired token. Token removed.");
                         localStorage.removeItem('github_pat'); 
                     } else if (response.status === 422 && errorText.includes('"sha" wasn\'t supplied.')) {
-                        alert("خطا در ذخیره (422): اطلاعات فایل در گیت‌هاب بروزرسانی نشده. لطفاً توکن را حذف و مجدد وارد کنید یا فایل را دستی بررسی کنید.");
+                        alert("Save error (422): File data on GitHub is not up-to-date. Please remove and re-enter the token or manually check the file.");
                     }
                     return false;
                 }
@@ -944,11 +940,10 @@ function showAdminOptions() {
             }
         }
 
-        // 🚨 FINAL SAVE FUNCTION 2 (MATCH HISTORY) - FIX FOR 422 SHA ISSUE
         async function saveMatchHistoryToGitHub(data, commitMessage) {
             const TOKEN = localStorage.getItem('github_pat');
             if (!TOKEN) { 
-                alert("عملیات ذخیره‌سازی به دلیل عدم وجود توکن گیت‌هاب لغو شد."); 
+                alert("Save operation canceled due to missing GitHub token."); 
                 return false; 
             }
 
@@ -961,11 +956,8 @@ function showAdminOptions() {
                 branch: GITHUB_LEAGUE_BRANCH 
             };
             
-            // ✅ منطق اصلاح شده: SHA فقط در صورت وجود به درخواست اضافه می‌شود (رفع مشکل 422)
             if (matchesSha) {
                 requestBody.sha = matchesSha;
-            } else {
-                 console.log("First time commit for history data or SHA reset. Attempting to create file.");
             }
             
             try {
@@ -980,18 +972,17 @@ function showAdminOptions() {
 
                 if (response.ok) {
                     const responseData = await response.json();
-                    matchesSha = responseData.content.sha; // SHA جدید را ذخیره می‌کنیم
+                    matchesSha = responseData.content.sha; 
                     return true;
                 } else {
                     const errorText = await response.text();
                     console.error("GitHub History Save Error (Status:", response.status, "):", errorText);
-                    // 🚨 در صورت بروز خطا، SHA را ریست می‌کنیم تا در تلاش بعدی دوباره بارگذاری شود.
                     matchesSha = null;
                     if(response.status === 401 || response.status === 403) { 
-                        alert("خطا در توکن گیت‌هاب: مجوز کافی نیست یا توکن منقضی شده است. توکن حذف شد.");
+                        alert("GitHub token error: Insufficient permissions or expired token. Token removed.");
                         localStorage.removeItem('github_pat'); 
                     } else if (response.status === 422 && errorText.includes('"sha" wasn\'t supplied.')) {
-                        alert("خطا در ذخیره (422): اطلاعات فایل در گیت‌هاب بروزرسانی نشده. لطفاً توکن را حذف و مجدد وارد کنید یا فایل را دستی بررسی کنید.");
+                        alert("Save error (422): File data on GitHub is not up-to-date. Please remove and re-enter the token or manually check the file.");
                     }
                     return false;
                 }
@@ -1006,19 +997,16 @@ function showAdminOptions() {
         
         function updateDateTime() {
             const now = new Date();
-            const tehranTime = now.toLocaleString("en-US", { timeZone: "Asia/Tehran", hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            const localTime = now.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            const localDate = now.toLocaleDateString("en-US", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
             
-            const shamsiDate = new persianDate(now).format('dddd YYYY/MM/DD');
-            
-            document.getElementById('current-datetime').textContent = `${shamsiDate} - ساعت: ${tehranTime} (به وقت تهران)`;
+            document.getElementById('current-datetime').textContent = `${localDate} - Time: ${localTime}`;
         }
         
         // --- FINAL APP STARTUP ---
         initializeLeagueData();
         
         document.addEventListener('DOMContentLoaded', () => {
-            // ⚠️ NEW: Removed the dynamic addition of Admin buttons from here.
-
             updateDateTime();
             setInterval(updateDateTime, 1000); 
             startApp();
