@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS App V2.0 - Final Structure (League Complete)</title>
+    <title>HARFS App V3.0 - League Admin & History</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-    <script src="https://unpkg.com/persian-date@1.1.0/dist/persian-date-0.1.8.min.js"></script> 
+    
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script> 
     
     <style>
         /* Base Styles & Variables */
@@ -80,7 +81,7 @@
             overflow-y: auto;
         }
         
-        /* --- League Table Styles (Complete) --- */
+        /* --- League Table Styles (Updated) --- */
         #league-table-screen { padding: 20px 0; }
         .league-header {
             direction: rtl; text-align: right; width: 100%; padding: 0 10px; margin-bottom: 20px;
@@ -91,9 +92,10 @@
             direction: rtl; width: 100%; padding: 0 10px;
         }
         .team-row {
+            /* 10 columns: # | Team | P | W | D | L | GF | GA | GD | Pts */
             display: grid; 
-            grid-template-columns: 0.3fr 2fr repeat(4, 0.8fr) 1fr; /* Rank | Name | P | W | D | L | Pts */
-            padding: 10px 0; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            grid-template-columns: 0.3fr 1.8fr repeat(4, 0.6fr) repeat(3, 0.7fr) 0.8fr; 
+            padding: 10px 0; font-size: 0.8rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             align-items: center;
         }
         .team-header { 
@@ -101,7 +103,7 @@
             padding: 8px 0; text-align: center; 
         }
         .team-name { font-weight: 600; text-align: right; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
-        .team-pts { font-weight: bold; color: var(--secondary-color); font-size: 1.1rem; }
+        .team-pts { font-weight: bold; color: var(--secondary-color); font-size: 1rem; }
         .team-rank { font-weight: 700; color: #a855f7; text-align: center; }
 
         /* Match Registration Modal */
@@ -113,7 +115,6 @@
             background: #282828; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px;
             direction: rtl; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
         }
-        .modal-input-group { margin-bottom: 15px; }
         
         .modal-content select, .modal-content input[type="number"] {
             color: #1a1a1a !important; 
@@ -141,7 +142,11 @@
                     <i class="fas fa-futbol"></i> 
                     <span>جدول لیگ</span>
                 </div>
-            </div>
+                <div class="menu-item text-xl font-semibold" onclick="navigate('history')">
+                    <i class="fas fa-history"></i> 
+                    <span>تاریخچه بازی‌ها</span>
+                </div>
+                </div>
         </div>
 
         <div id="music-player-view" class="page-screen">
@@ -161,7 +166,7 @@
             <div class="league-header">
                 <div class="flex justify-between items-center mb-4">
                     <button class="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg text-sm" onclick="showRegistrationModal()">
-                        <i class="fas fa-plus ml-1"></i> ثبت نتیجه جدید
+                        <i class="fas fa-plus ml-1"></i> ثبت نتیجه جدید (نیازمند رمز)
                     </button>
                     <button class="text-gray-400 hover:text-white text-xl" onclick="navigate('menu')">
                         <i class="fas fa-chevron-right"></i> بازگشت
@@ -178,6 +183,9 @@
                     <div>برد</div>
                     <div>مساوی</div>
                     <div>باخت</div>
+                    <div>زده</div> 
+                    <div>خورده</div>
+                    <div>تفاضل</div>
                     <div class="team-pts">امتیاز</div>
                 </div>
             </div>
@@ -186,6 +194,23 @@
                 <div id="league-table-body">
                     </div>
                 <div id="loading-message" class="text-center text-gray-500 mt-10">در حال بارگذاری اطلاعات لیگ...</div>
+            </div>
+        </div>
+        
+        <div id="match-history-screen" class="page-screen">
+            <div class="league-header">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-center text-purple-300">تاریخچه کامل بازی‌ها</h2>
+                    <button class="text-gray-400 hover:text-white text-xl" onclick="navigate('menu')">
+                        <i class="fas fa-chevron-right"></i> بازگشت
+                    </button>
+                </div>
+            </div>
+            
+            <div class="w-full px-4">
+                <div id="history-list" class="flex flex-col gap-3">
+                    <div id="history-loading" class="text-center text-gray-500 mt-10">در حال بارگذاری تاریخچه...</div>
+                </div>
             </div>
         </div>
         
@@ -229,12 +254,18 @@
     </div>
 
     <script>
-        // *** Global Configuration (Using previous assumption) ***
+        // ----------------------------------------------------
+        // *** GLOBAL CONFIGURATION (UPDATED) ***
+        // ----------------------------------------------------
         const GITHUB_REPO = "rzarisfi/HarfsMusic"; 
         const GITHUB_LEAGUE_BRANCH = "league-data";
         const GITHUB_LEAGUE_FILE = "league_data.json";
+        const GITHUB_MATCHES_FILE = "match_history.json"; // NEW: تاریخچه بازی‌ها
+        
+        // ⚠️ NEW: رمز عبور ادمین (لطفاً این را به یک رمز قوی تغییر دهید!)
+        const ADMIN_PASSWORD = "harfsadmin123"; 
 
-        // Global Team List (Keys used for JSON and calculations - English names)
+        // Global Team List (English keys)
         const TEAM_NAMES = [
             "Real_Madrid", 
             "Barcelona", 
@@ -252,7 +283,37 @@
             "Red": "قرمز"
         };
         
-        // --- Core App & Navigation Logic ---
+        let leagueData = {}; 
+        let sha = null; // SHA برای فایل league_data.json
+        let matchHistory = []; // NEW: آرایه تاریخچه بازی‌ها
+        let matchesSha = null; // NEW: SHA برای فایل match_history.json
+
+        // ----------------------------------------------------
+        // *** ADMIN & UI FUNCTIONS (NEW/UPDATED) ***
+        // ----------------------------------------------------
+
+        function checkAdminAccess() {
+             const password = prompt("لطفاً رمز عبور مدیریت را وارد کنید:");
+             if (password === ADMIN_PASSWORD) {
+                 return true;
+             }
+             alert("رمز عبور اشتباه است.");
+             return false;
+        }
+
+        // تابع ثبت نتیجه جدید (حفاظت شده)
+        function showRegistrationModal() { 
+             if (!checkAdminAccess()) return; // بررسی رمز
+             // Reset scores...
+             document.getElementById('home-score').value = 0;
+             document.getElementById('away-score').value = 0;
+             document.getElementById('modal-error').style.display = 'none';
+             document.getElementById('match-registration-modal').style.display = 'flex'; 
+        }
+
+        // ----------------------------------------------------
+        // *** CORE APP & NAVIGATION LOGIC ***
+        // ----------------------------------------------------
         
         function navigate(route) {
             document.querySelectorAll('.page-screen').forEach(screen => {
@@ -271,7 +332,6 @@
                 case 'player':
                     targetScreen = document.getElementById('music-player-view');
                     targetScreen.style.display = 'flex';
-                    // No music player logic here yet
                     break;
                 case 'league':
                     targetScreen = document.getElementById('league-table-screen');
@@ -280,14 +340,18 @@
                     document.getElementById('loading-message').style.display = 'block';
                     loadLeagueDataFromGitHub().then(renderLeagueTable);
                     break;
+                // ✅ NEW: تاریخچه بازی‌ها
+                case 'history':
+                    targetScreen = document.getElementById('match-history-screen');
+                    targetScreen.style.display = 'flex';
+                    document.getElementById('history-loading').style.display = 'block';
+                    loadMatchHistoryFromGitHub().then(renderMatchHistory);
+                    break;
             }
         }
         
-        // --- Splash Screen & Initialization ---
-        
         function startApp() {
             const SPLASH_DURATION_MS = 2000; 
-            
             const harfsText = document.getElementById('harfs-text');
             harfsText.classList.remove('splash-text');
             void harfsText.offsetWidth; 
@@ -306,20 +370,15 @@
         }
 
         // ----------------------------------------------------
-        // *** LEAGUE TABLE LOGIC (COMPLETE) ***
+        // *** LEAGUE TABLE LOGIC (UPDATED FOR DISPLAY) ***
         // ----------------------------------------------------
 
-        let leagueData = {}; 
-        let sha = null; 
-        
         function initializeLeagueData() {
             TEAM_NAMES.forEach(teamKey => {
-                // 'name' property is for internal use (sorting/display)
                 leagueData[teamKey] = { name: teamKey, P: 0, W: 0, D: 0, L: 0, GF: 0, GA: 0, Pts: 0 };
             });
         }
         
-        // Sorting logic: 1. Points 2. Goal Difference 3. Goals For
         function calculateLeagueTable() {
             const table = Object.values(leagueData).sort((a, b) => {
                 if (b.Pts !== a.Pts) return b.Pts - a.Pts;
@@ -338,7 +397,7 @@
              
              document.getElementById('loading-message').style.display = 'none';
 
-             // Inject table rows - از TEAM_DISPLAY_NAMES برای نمایش استفاده می‌کند
+             // ✅ UPDATED: اضافه شدن تفاضل، گل زده و گل خورده به رندر
              tableBody.innerHTML = calculatedTable.map((team, index) => `
                 <div class="team-row text-center hover:bg-gray-800 transition duration-150">
                     <div class="team-rank">${index + 1}</div>
@@ -347,15 +406,17 @@
                     <div>${team.W}</div>
                     <div>${team.D}</div>
                     <div>${team.L}</div>
+                    <div>${team.GF}</div> 
+                    <div>${team.GA}</div>
+                    <div class="font-bold">${team.GF - team.GA}</div> 
                     <div class="team-pts">${team.Pts}</div>
                 </div>
              `).join('');
              
-             // Populate team selectors in modal - از TEAM_DISPLAY_NAMES برای نمایش استفاده می‌کند
+             // Populate team selectors
              const homeSelect = document.getElementById('home-team-select');
              const awaySelect = document.getElementById('away-team-select');
              
-             // Check if already populated to prevent unnecessary re-rendering
              if (homeSelect.options.length !== TEAM_NAMES.length) {
                 const optionsHtml = TEAM_NAMES.map(teamKey => 
                     `<option value="${teamKey}">${TEAM_DISPLAY_NAMES[teamKey] || teamKey}</option>`
@@ -410,34 +471,98 @@
                 updateTeamStats(homeTeam, homeScore, awayScore);
                 updateTeamStats(awayTeam, awayScore, homeScore);
                 
-                // The 'name' property is just for local calculation/sorting, not saved to GitHub
-                // We pass the English keys to saveLeagueDataToGitHub
+                // ✅ NEW: ذخیره جزئیات بازی در تاریخچه
+                const matchDetail = {
+                    home: homeTeamName,
+                    away: awayTeamName,
+                    score: `${homeScore}-${awayScore}`,
+                    timestamp: new Date().toISOString()
+                };
+                matchHistory.unshift(matchDetail); // اضافه کردن به ابتدای آرایه (جدیدترین بالا)
+                
+                const successLeague = await saveLeagueDataToGitHub(leagueData, `Match Result: ${homeTeamName} ${homeScore}-${awayScore} ${awayTeamName}`);
+                const successHistory = await saveMatchHistoryToGitHub(matchHistory, `Add Match: ${matchDetail.score}`);
 
-                const success = await saveLeagueDataToGitHub(leagueData, `Match Result: ${homeTeamName} ${homeScore}-${awayScore} ${awayTeamName}`);
-                if (success) {
+
+                if (successLeague && successHistory) {
                     hideRegistrationModal();
                     renderLeagueTable(leagueData);
-                    alert("نتیجه بازی با موفقیت ثبت و ذخیره شد.");
+                    alert("نتیجه بازی و تاریخچه با موفقیت ثبت و ذخیره شد.");
                 } else {
-                    alert("خطا در ذخیره‌سازی! لطفاً توکن گیت‌هاب را بررسی کنید.");
+                    alert("خطا در ذخیره‌سازی! لطفاً توکن گیت‌هاب و وضعیت فایل‌ها را بررسی کنید.");
                 }
             }
         }
 
         // ----------------------------------------------------
-        // *** GITHUB API INTERACTION (COMPLETE) ***
+        // *** MATCH HISTORY LOGIC (NEW) ***
         // ----------------------------------------------------
 
-        const BASE_API_URL = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_LEAGUE_FILE}`;
+        function renderMatchHistory(history) {
+            const historyList = document.getElementById('history-list');
+            document.getElementById('history-loading').style.display = 'none';
+
+            if (history.length === 0) {
+                 historyList.innerHTML = '<div class="text-center text-gray-500 mt-5">هنوز بازی ثبت نشده است.</div>';
+                 return;
+            }
+
+            const historyHtml = history.map(match => {
+                const homeName = TEAM_DISPLAY_NAMES[match.home] || match.home;
+                const awayName = TEAM_DISPLAY_NAMES[match.away] || match.away;
+                
+                // فرمت کردن زمان شمسی
+                const date = new persianDate(new Date(match.timestamp)).format('dddd YYYY/MM/DD');
+                // فرمت کردن زمان میلادی به وقت تهران
+                const time = new Date(match.timestamp).toLocaleTimeString("fa-IR", { timeZone: "Asia/Tehran", hour: '2-digit', minute: '2-digit', hour12: false });
+                
+                return `
+                    <div class="p-4 bg-gray-800 rounded-lg shadow-md border-r-4 border-purple-500 text-sm">
+                        <div class="font-bold text-center text-lg mb-2">
+                            <span>${homeName}</span> 
+                            <span class="text-purple-300 mx-2">${match.score}</span> 
+                            <span>${awayName}</span>
+                        </div>
+                        <div class="text-xs text-gray-400 text-center">
+                            <span>تاریخ: ${date}</span> | <span>ساعت: ${time} (تهران)</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            historyList.innerHTML = historyHtml;
+        }
+
+        // ----------------------------------------------------
+        // *** GITHUB API INTERACTION (UPDATED/NEW) ***
+        // ----------------------------------------------------
+
+        const BASE_API_URL = `https://api.github.com/repos/${GITHUB_REPO}/contents/`;
+        
+        async function getGitHubToken() {
+             let TOKEN = localStorage.getItem('github_pat');
+            
+             if (!TOKEN) {
+                 TOKEN = prompt("لطفاً GitHub Personal Access Token خود را وارد کنید (باید مجوز repo داشته باشد):");
+                 if (!TOKEN) {
+                      alert("برای ذخیره‌سازی، به توکن GitHub نیاز است.");
+                      return null;
+                 }
+                 localStorage.setItem('github_pat', TOKEN);
+             }
+             return TOKEN;
+        }
         
         // Loads league data from the specified GitHub file and branch
         async function loadLeagueDataFromGitHub() {
             if (Object.keys(leagueData).length === 0) {
                  initializeLeagueData();
             }
-            
+            const token = await getGitHubToken();
+            if (!token) return leagueData;
+
             try {
-                const response = await fetch(`${BASE_API_URL}?ref=${GITHUB_LEAGUE_BRANCH}`);
+                const response = await fetch(`${BASE_API_URL}${GITHUB_LEAGUE_FILE}?ref=${GITHUB_LEAGUE_BRANCH}`);
                 
                 if (response.ok) {
                     const shaData = await response.json();
@@ -446,49 +571,62 @@
                     const fileContentResponse = await fetch(shaData.download_url);
                     const fileContent = await fileContentResponse.json();
                     
-                    // Merge loaded data into the initialized structure
                     Object.keys(fileContent).forEach(teamKey => {
                         if (leagueData[teamKey]) {
-                            // Merge and ensure 'name' property is set for local calculations
                             leagueData[teamKey] = { ...leagueData[teamKey], ...fileContent[teamKey], name: teamKey };
                         }
                     });
                     
                     return leagueData;
                 } else if (response.status === 404) {
-                    console.log("League data file not found. Initializing new data and creating file on GitHub.");
-                    // Attempt initial commit with empty data
+                    console.log("League data file not found. Attempting initial commit.");
                     await saveLeagueDataToGitHub(leagueData, 'Initial commit: created league data file.');
                     return leagueData;
-                } else {
-                    throw new Error(`Failed to fetch league data: ${response.statusText}`);
-                }
+                } 
+                throw new Error(`Failed to fetch league data: ${response.statusText} (${response.status})`);
             } catch (error) {
                 console.error("Error in loadLeagueDataFromGitHub:", error);
-                // Return local data structure if fetch fails
                 return leagueData; 
+            }
+        }
+        
+        // NEW: Loads match history from GitHub
+        async function loadMatchHistoryFromGitHub() {
+            const token = await getGitHubToken();
+            if (!token) return [];
+
+            try {
+                const response = await fetch(`${BASE_API_URL}${GITHUB_MATCHES_FILE}?ref=${GITHUB_LEAGUE_BRANCH}`);
+                
+                if (response.ok) {
+                    const shaData = await response.json();
+                    matchesSha = shaData.sha; 
+                    const fileContentResponse = await fetch(shaData.download_url);
+                    matchHistory = await fileContentResponse.json();
+                    return matchHistory;
+                } else if (response.status === 404) {
+                    console.log("Match history file not found. Initializing empty history.");
+                    await saveMatchHistoryToGitHub([], 'Initial commit: created match history file.');
+                    return [];
+                }
+                throw new Error(`Failed to fetch history: ${response.statusText}`);
+            } catch (error) {
+                console.error("Error in loadMatchHistoryFromGitHub:", error);
+                return [];
             }
         }
         
         // Saves league data back to GitHub
         async function saveLeagueDataToGitHub(data, commitMessage) {
-            const TOKEN = localStorage.getItem('github_pat') || prompt("لطفاً GitHub Personal Access Token خود را وارد کنید (باید مجوز repo داشته باشد):");
-            if (!TOKEN) {
-                 alert("برای ذخیره‌سازی، به توکن GitHub نیاز است.");
-                 return false;
-            }
-            
-            localStorage.setItem('github_pat', TOKEN); 
+            const TOKEN = localStorage.getItem('github_pat');
+            if (!TOKEN) return false;
 
-            // Prepare data for GitHub: Only statistical properties
             const dataToSave = {};
             Object.keys(data).forEach(key => {
-                const { name, ...stats } = data[key]; // Exclude the 'name' property
+                const { name, ...stats } = data[key]; 
                 dataToSave[key] = stats;
             });
-
             const content = JSON.stringify(dataToSave, null, 2);
-            // Base64 encode the content
             const base64Content = btoa(unescape(encodeURIComponent(content)));
 
             const body = { 
@@ -499,7 +637,7 @@
             };
             
             try {
-                const response = await fetch(BASE_API_URL, {
+                const response = await fetch(`${BASE_API_URL}${GITHUB_LEAGUE_FILE}`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `token ${TOKEN}`,
@@ -510,41 +648,65 @@
 
                 if (response.ok) {
                     const responseData = await response.json();
-                    sha = responseData.content.sha; // Update SHA for next commit
+                    sha = responseData.content.sha;
                     return true;
                 } else {
-                    const error = await response.json();
-                    console.error("GitHub Save Error:", error);
-                    alert(`خطا در ذخیره سازی! کد خطا: ${response.status}. پیام: ${error.message}`);
+                    if(response.status === 401 || response.status === 403) { localStorage.removeItem('github_pat'); }
                     return false;
                 }
             } catch (error) {
-                console.error("Network or Unexpected Error:", error);
-                alert("خطای شبکه یا خطای نامشخص در ذخیره‌سازی.");
+                return false;
+            }
+        }
+
+        // NEW: Saves match history to GitHub
+        async function saveMatchHistoryToGitHub(data, commitMessage) {
+            const TOKEN = localStorage.getItem('github_pat');
+            if (!TOKEN) return false;
+
+            const content = JSON.stringify(data, null, 2);
+            const base64Content = btoa(unescape(encodeURIComponent(content)));
+
+            const body = { 
+                message: commitMessage, 
+                content: base64Content, 
+                sha: matchesSha, 
+                branch: GITHUB_LEAGUE_BRANCH 
+            };
+            
+            try {
+                const response = await fetch(`${BASE_API_URL}${GITHUB_MATCHES_FILE}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (response.ok) {
+                    const responseData = await response.json();
+                    matchesSha = responseData.content.sha;
+                    return true;
+                } else {
+                    if(response.status === 401 || response.status === 403) { localStorage.removeItem('github_pat'); }
+                    return false;
+                }
+            } catch (error) {
                 return false;
             }
         }
         
         // --- Modal & Time Logic ---
         
-        function showRegistrationModal() { 
-            // Reset scores
-            document.getElementById('home-score').value = 0;
-            document.getElementById('away-score').value = 0;
-            document.getElementById('modal-error').style.display = 'none';
-            document.getElementById('match-registration-modal').style.display = 'flex'; 
-        }
-        
         function hideRegistrationModal() { 
             document.getElementById('match-registration-modal').style.display = 'none'; 
         }
         
         function updateDateTime() {
-            // Get current time in Tehran timezone
             const now = new Date();
             const tehranTime = now.toLocaleString("en-US", { timeZone: "Asia/Tehran", hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
             
-            // Use persian-date library for Shamsi date
             const shamsiDate = new persianDate(now).format('dddd YYYY/MM/DD');
             
             document.getElementById('current-datetime').textContent = `${shamsiDate} - ساعت: ${tehranTime} (به وقت تهران)`;
@@ -552,8 +714,12 @@
         
         // --- FINAL APP STARTUP ---
         initializeLeagueData();
-        setInterval(updateDateTime, 1000); // Start clock
-        document.addEventListener('DOMContentLoaded', startApp);
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDateTime();
+            setInterval(updateDateTime, 1000); 
+            startApp();
+        });
     </script>
 </body>
-    </html>
+</html>
