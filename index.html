@@ -10,140 +10,186 @@
     
     <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script> 
     
-    <style>
-        /* Base Styles & Variables */
-        :root {
-            --primary-color: #5b21b6; /* Purple-700 */
-            --secondary-color: #c4b5fd; /* Purple-300 */
-            --glass-bg: rgba(255, 255, 255, 0.1);
-        }
+   <style>
+    /* Base Styles & Variables */
+    :root {
+        --primary-color: #7c3aed; /* Updated: Purple-500 for better contrast */
+        --secondary-color: #a78bfa; /* Updated: Purple-400 */
+        --glass-bg: rgba(255, 255, 255, 0.08); /* Slightly less opaque */
+        --dark-bg: #121212; /* Very Dark Background */
+        --shadow-color: rgba(0, 0, 0, 0.4);
+    }
 
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #1a1a1a;
-            direction: ltr; 
-            overflow: hidden;
-            padding: 0; 
-        }
+    body {
+        font-family: 'Vazirmatn', sans-serif;
+        color: #fff;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* --- CHANGE 1: Subtle Gradient Background --- */
+        background: radial-gradient(circle at top, #2d1045 0%, #121212 100%);
+        direction: ltr; 
+        overflow: hidden;
+        padding: 0; 
+    }
 
-        /* --- Global App Container --- */
-        .app-container {
-            width: 100%; max-width: 380px; height: 100vh; position: relative; overflow: hidden; padding: 0 20px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
+    /* --- Global App Container (No Change) --- */
+    .app-container {
+        width: 100%; max-width: 380px; height: 100vh; position: relative; overflow: hidden; padding: 0 20px;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+    }
 
-        /* --- Splash Screen --- */
-        #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; z-index: 100;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 1s ease-out;
-        }
-        .splash-text {
-            font-size: 3rem; font-weight: 700; letter-spacing: 5px; opacity: 0; color: white;
-            animation: blink 0.5s steps(1, start) infinite alternate;
-            animation-duration: 0.5s;
-            animation-iteration-count: 4;
-        }
-        
-        @keyframes blink { 0% { opacity: 0; } 100% { opacity: 1; } }
-        
-        /* --- Menu Screen --- */
-        #menu-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s; opacity: 0; background: #1a1a1a; direction: rtl;
-        }
-        #menu-screen.active { display: flex; opacity: 1; }
-        .menu-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 400px; margin-top: 30px;
-        }
-        .menu-item {
-            padding: 20px; border-radius: 15px; background: var(--glass-bg); backdrop-filter: blur(10px);
-            cursor: pointer; transition: background 0.2s, transform 0.2s; text-align: center;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px;
-        }
-        .menu-item:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
-        .menu-item i { font-size: 3rem; margin-bottom: 10px; color: var(--primary-color); }
-        
-        /* Specific Admin Item Style */
-        .menu-item.admin-item {
-            background-color: #4a0e71; /* Darker Purple for Admin */
-        }
-        .menu-item.admin-item:hover {
-            background-color: #5b21b6; 
-        }
+    /* --- Splash Screen --- */
+#splash-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--dark-bg); z-index: 100;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    transition: opacity 1s ease-out;
+}
+/* 👇 تغییرات از اینجا شروع می‌شود 👇 */
+.splash-text {
+    font-size: 3rem; font-weight: 700; letter-spacing: 5px; color: white;
+    /* اعمال انیمیشن تپش نرم */
+    animation: pulse 1.5s infinite alternate; 
+}
 
-        /* --- Screens (Player/League) --- */
-        .page-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40;
-            display: none; flex-direction: column; justify-content: flex-start; align-items: center;
-            background: #1a1a1a;
-            direction: rtl;
-            padding: 20px 0; 
-            box-sizing: border-box;
-            overflow-y: auto;
-        }
-        
-        /* --- League Table Styles --- */
-        #league-table-screen { padding: 20px 0; }
-        .league-header {
-            direction: rtl; text-align: right; width: 100%; padding: 0 10px; margin-bottom: 20px;
-            position: sticky; top: 0; z-index: 10; background: #1a1a1a; padding-top: 10px; 
-            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
-        }
-        .league-table-container {
-            direction: rtl; width: 100%; padding: 0 10px;
-        }
-        .team-row {
-            /* 10 columns: # | Team | P | W | D | L | GF | GA | GD | Pts */
-            display: grid; 
-            grid-template-columns: 0.3fr 1.8fr repeat(4, 0.6fr) repeat(3, 0.7fr) 0.8fr; 
-            padding: 10px 0; font-size: 0.8rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            align-items: center;
-        }
-        .team-header { 
-            font-weight: bold; background: rgba(255, 255, 255, 0.1); border-radius: 5px; 
-            padding: 8px 0; text-align: center; 
-        }
-        .team-name { font-weight: 600; text-align: right; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
-        .team-pts { font-weight: bold; color: var(--secondary-color); font-size: 1rem; }
-        .team-rank { font-weight: 700; color: #a855f7; text-align: center; }
+/* تعریف انیمیشن تپش نرم */
+@keyframes pulse { 
+    0% { opacity: 0.3; } 
+    50% { opacity: 1; } 
+    100% { opacity: 0.3; } 
+}
+/* 👆 تغییرات تا اینجا است 👆 */
+    
+    /* --- Menu Screen (No Change) --- */
+    #menu-screen {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
+        display: none; flex-direction: column; justify-content: center; align-items: center;
+        transition: opacity 0.5s; opacity: 0; background: transparent; direction: rtl;
+    }
+    #menu-screen.active { display: flex; opacity: 1; }
+    .menu-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 400px; margin-top: 30px;
+    }
+    
+    /* --- CHANGE 2: Enhanced Menu Items (Soft UI Look) --- */
+    .menu-item {
+        padding: 20px; border-radius: 15px; 
+        background: #1e1e1e; /* Darker solid color */
+        backdrop-filter: blur(10px);
+        cursor: pointer; 
+        transition: background 0.2s, transform 0.2s, box-shadow 0.3s; 
+        text-align: center;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px;
+        box-shadow: 5px 5px 15px var(--shadow-color), -5px -5px 15px rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.05); /* Subtle border */
+    }
+    .menu-item:hover { 
+        background: #252525; 
+        transform: scale(1.05); 
+        box-shadow: 0 0 25px var(--primary-color); /* Glow on hover */
+    }
+    .menu-item i { font-size: 3rem; margin-bottom: 10px; color: var(--secondary-color); }
+    
+    /* Specific Admin Item Style */
+    .menu-item.admin-item {
+        background-color: #3b0764; /* Even darker Purple for Admin */
+        border: 1px solid var(--primary-color);
+    }
+    .menu-item.admin-item:hover {
+        background-color: #5b21b6; 
+    }
 
-        /* Match Registration Modal */
-        #match-registration-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85);
-            z-index: 1000; display: none; align-items: center; justify-content: center;
-        }
-        
-        /* Admin Options Modal CSS */
-        #admin-options-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9);
-            z-index: 2000; display: none; align-items: center; justify-content: center;
-        }
-        #admin-options-modal .modal-content {
-            background: #282828; padding: 20px; border-radius: 15px; width: 95%; max-width: 500px;
-            direction: rtl; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
-        }
-        .admin-match-item {
-             display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .modal-content {
-            background: #282828; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px;
-            direction: rtl; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-        }
-        
-        .modal-content select, .modal-content input[type="number"] {
-            color: #1a1a1a !important; 
-            background-color: #f0f0f0; 
-            border: none;
-        }
-    </style>
+    /* --- Screens (Player/League) --- */
+    .page-screen {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40;
+        display: none; flex-direction: column; justify-content: flex-start; align-items: center;
+        background: transparent; /* Changed to transparent to show body gradient */
+        direction: rtl;
+        padding: 20px 0; 
+        box-sizing: border-box;
+        overflow-y: auto;
+    }
+    
+    /* --- League Table Styles --- */
+    #league-table-screen { padding: 20px 0; }
+    .league-header {
+        direction: rtl; text-align: right; width: 100%; padding: 0 10px; margin-bottom: 20px;
+        position: sticky; top: 0; z-index: 10; 
+        background: var(--dark-bg); 
+        padding-top: 10px; 
+        box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+    }
+    .league-table-container {
+        direction: rtl; 
+        width: 100%; 
+        padding: 0 10px;
+        /* --- CHANGE 3: Border Radius for Table --- */
+        border-radius: 10px; 
+        overflow: hidden; /* Important for table border radius */
+    }
+    
+    .team-header { 
+        font-weight: bold; 
+        background: #3a1b5c; /* Darker header color */
+        padding: 10px 0; 
+        text-align: center; 
+        border-bottom: 2px solid var(--primary-color);
+    }
+    
+    /* --- CHANGE 3: Alternate Row Colors for Readability --- */
+    .team-row {
+        /* 10 columns: # | Team | P | W | D | L | GF | GA | GD | Pts */
+        display: grid; 
+        grid-template-columns: 0.3fr 1.8fr repeat(4, 0.6fr) repeat(3, 0.7fr) 0.8fr; 
+        padding: 10px 0; font-size: 0.8rem; 
+        align-items: center;
+        transition: background 0.2s;
+    }
+    .team-row:nth-child(even) {
+        background-color: #202020; /* Slightly darker grey */
+    }
+    .team-row:nth-child(odd) {
+        background-color: #282828; /* Base row color */
+    }
+    .team-row:hover {
+        background-color: #3b0764; /* Highlight color on hover */
+    }
+
+    .team-name { font-weight: 600; text-align: right; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+    .team-pts { font-weight: bold; color: #ffeb3b; font-size: 1rem; } /* Changed to yellow for points */
+    .team-rank { font-weight: 700; color: #a78bfa; text-align: center; }
+
+    /* Match Registration Modal (No Major Change) */
+    #match-registration-modal {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85);
+        z-index: 1000; display: none; align-items: center; justify-content: center;
+    }
+    
+    /* Admin Options Modal CSS (No Major Change) */
+    #admin-options-modal {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9);
+        z-index: 2000; display: none; align-items: center; justify-content: center;
+    }
+    #admin-options-modal .modal-content {
+        background: #282828; padding: 20px; border-radius: 15px; width: 95%; max-width: 500px;
+        direction: rtl; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+    }
+    .admin-match-item {
+         display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .modal-content {
+        background: #282828; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px;
+        direction: rtl; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+    
+    .modal-content select, .modal-content input[type="number"] {
+        color: #1a1a1a !important; 
+        background-color: #f0f0f0; 
+        border: none;
+    }
+</style>
 </head>
 <body>
     <div id="splash-screen">
@@ -153,12 +199,12 @@
     <div class="app-container hidden" id="app-container">
         
         <div id="menu-screen">
-            <h1 class="text-3xl font-bold text-purple-400">منوی اصلی HARFS</h1>
+            <h1 class="text-3xl font-bold text-purple-400">HARFS</h1>
             
             <div class="menu-grid">
                 <div class="menu-item text-xl font-semibold" onclick="navigate('player')">
                     <i class="fas fa-music"></i> 
-                    <span>پخش کننده موسیقی</span>
+                    <span>Music Player</span>
                 </div>
                 <div class="menu-item text-xl font-semibold" onclick="navigate('league')">
                     <i class="fas fa-futbol"></i> 
@@ -196,7 +242,7 @@
                     </button>
                 </div>
                 
-                <h2 class="text-2xl font-bold text-center text-purple-300 mb-1">جدول کامل لیگ</h2>
+                <h2 class="text-2xl font-bold text-center text-purple-300 mb-1">جدول لیگ</h2>
                 <div class="text-center text-sm text-gray-400" id="current-datetime">Loading...</div>
                 
                 <div class="team-row team-header text-center mt-4">
