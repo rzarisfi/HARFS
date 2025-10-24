@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HARFS App V3.0 - League Admin & History</title>
+    <title>HARFS App V3.1 - Final Admin & League Build</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
@@ -81,7 +81,7 @@
             overflow-y: auto;
         }
         
-        /* --- League Table Styles (Updated) --- */
+        /* --- League Table Styles --- */
         #league-table-screen { padding: 20px 0; }
         .league-header {
             direction: rtl; text-align: right; width: 100%; padding: 0 10px; margin-bottom: 20px;
@@ -111,6 +111,20 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85);
             z-index: 1000; display: none; align-items: center; justify-content: center;
         }
+        
+        /* Admin Options Modal CSS */
+        #admin-options-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+        }
+        #admin-options-modal .modal-content {
+            background: #282828; padding: 20px; border-radius: 15px; width: 95%; max-width: 500px;
+            direction: rtl; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+        }
+        .admin-match-item {
+             display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
         .modal-content {
             background: #282828; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px;
             direction: rtl; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
@@ -146,7 +160,7 @@
                     <i class="fas fa-history"></i> 
                     <span>تاریخچه بازی‌ها</span>
                 </div>
-                </div>
+            </div>
         </div>
 
         <div id="music-player-view" class="page-screen">
@@ -165,9 +179,6 @@
         <div id="league-table-screen" class="page-screen">
             <div class="league-header">
                 <div class="flex justify-between items-center mb-4">
-                    <button class="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg text-sm" onclick="showRegistrationModal()">
-                        <i class="fas fa-plus ml-1"></i> ثبت نتیجه جدید (نیازمند رمز)
-                    </button>
                     <button class="text-gray-400 hover:text-white text-xl" onclick="navigate('menu')">
                         <i class="fas fa-chevron-right"></i> بازگشت
                     </button>
@@ -250,17 +261,36 @@
                 </div>
             </div>
         </div>
+        
+        <div id="admin-options-modal">
+            <div class="modal-content">
+                <h3 class="text-xl font-bold mb-4 text-purple-400">پنل مدیریت بازی‌ها</h3>
+                
+                <div id="admin-history-list" class="max-h-80 overflow-y-auto mb-4 p-2 bg-gray-700 rounded-lg">
+                    <div class="text-center text-gray-400">در حال بارگذاری...</div>
+                </div>
+
+                <div class="flex justify-end mt-4">
+                    <button class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg ml-2" onclick="hideAdminOptionsModal()">
+                        بستن
+                    </button>
+                    <button class="bg-yellow-600 hover:bg-yellow-700 text-white p-2 rounded-lg" onclick="resetLeagueConfirm()">
+                        <i class="fas fa-undo mr-1"></i> بازنشانی کامل لیگ
+                    </button>
+                </div>
+            </div>
+        </div>
 
     </div>
 
     <script>
         // ----------------------------------------------------
-        // *** GLOBAL CONFIGURATION (UPDATED) ***
+        // *** GLOBAL CONFIGURATION (FINAL) ***
         // ----------------------------------------------------
         const GITHUB_REPO = "rzarisfi/HarfsMusic"; 
         const GITHUB_LEAGUE_BRANCH = "league-data";
         const GITHUB_LEAGUE_FILE = "league_data.json";
-        const GITHUB_MATCHES_FILE = "match_history.json"; // NEW: تاریخچه بازی‌ها
+        const GITHUB_MATCHES_FILE = "match_history.json"; 
         
         // ⚠️ NEW: رمز عبور ادمین (لطفاً این را به یک رمز قوی تغییر دهید!)
         const ADMIN_PASSWORD = "harfsadmin123"; 
@@ -285,11 +315,11 @@
         
         let leagueData = {}; 
         let sha = null; // SHA برای فایل league_data.json
-        let matchHistory = []; // NEW: آرایه تاریخچه بازی‌ها
-        let matchesSha = null; // NEW: SHA برای فایل match_history.json
+        let matchHistory = []; 
+        let matchesSha = null; // SHA برای فایل match_history.json
 
         // ----------------------------------------------------
-        // *** ADMIN & UI FUNCTIONS (NEW/UPDATED) ***
+        // *** ADMIN & UI FUNCTIONS ***
         // ----------------------------------------------------
 
         function checkAdminAccess() {
@@ -300,15 +330,132 @@
              alert("رمز عبور اشتباه است.");
              return false;
         }
-
-        // تابع ثبت نتیجه جدید (حفاظت شده)
+        
+        function showAdminOptionsModal() {
+             if (!checkAdminAccess()) return;
+             // قبل از باز کردن، تاریخچه را از نو رندر می‌کنیم
+             renderAdminHistory();
+             document.getElementById('admin-options-modal').style.display = 'flex';
+        }
+        
+        function hideAdminOptionsModal() {
+             document.getElementById('admin-options-modal').style.display = 'none';
+        }
+        
         function showRegistrationModal() { 
-             if (!checkAdminAccess()) return; // بررسی رمز
-             // Reset scores...
+             if (!checkAdminAccess()) return;
              document.getElementById('home-score').value = 0;
              document.getElementById('away-score').value = 0;
              document.getElementById('modal-error').style.display = 'none';
              document.getElementById('match-registration-modal').style.display = 'flex'; 
+        }
+        
+        function hideRegistrationModal() { 
+            document.getElementById('match-registration-modal').style.display = 'none'; 
+        }
+
+        // ----------------------------------------------------
+        // *** LEAGUE RECALCULATION & MANAGEMENT ***
+        // ----------------------------------------------------
+
+        function resetLeagueStats() {
+             TEAM_NAMES.forEach(teamKey => {
+                 leagueData[teamKey] = { name: teamKey, P: 0, W: 0, D: 0, L: 0, GF: 0, GA: 0, Pts: 0 };
+             });
+        }
+        
+        function recalculateLeagueFromHistory() {
+            resetLeagueStats(); 
+            
+            // Loop through all matches in the history
+            matchHistory.forEach(match => {
+                const [homeScore, awayScore] = match.score.split('-').map(Number);
+
+                if (leagueData[match.home] && leagueData[match.away]) {
+                    // Update stats for home team
+                    updateTeamStats(leagueData[match.home], homeScore, awayScore);
+                    // Update stats for away team
+                    updateTeamStats(leagueData[match.away], awayScore, homeScore);
+                }
+            });
+        }
+        
+        async function deleteMatch(index) {
+             if (!confirm("آیا مطمئن هستید که می‌خواهید این بازی را حذف کنید؟ این عمل غیرقابل بازگشت است.")) return;
+             
+             // 1. Remove the match from local history
+             matchHistory.splice(index, 1);
+             
+             // 2. Save the new history array to GitHub
+             const successHistory = await saveMatchHistoryToGitHub(matchHistory, `Admin: Deleted match at index ${index}`);
+
+             if (successHistory) {
+                 // 3. Recalculate all league stats from the updated history
+                 recalculateLeagueFromHistory();
+                 
+                 // 4. Save the new league stats to GitHub
+                 const successLeague = await saveLeagueDataToGitHub(leagueData, 'Admin: Recalculated league stats after deletion.');
+                 
+                 if (successLeague) {
+                     alert("بازی با موفقیت حذف و جدول لیگ بازنشانی شد.");
+                     hideAdminOptionsModal();
+                     // Refresh the league view
+                     renderLeagueTable(leagueData); 
+                 } else {
+                     alert("خطا در ذخیره‌سازی آمار لیگ پس از حذف. لطفاً توکن را بررسی کنید.");
+                 }
+             } else {
+                 alert("خطا در حذف بازی از تاریخچه گیت‌هاب.");
+             }
+        }
+        
+        async function resetLeagueConfirm() {
+             if (!confirm("هشدار! آیا مطمئن هستید که می‌خواهید تمام نتایج و تاریخچه را حذف کنید؟ این عمل غیرقابل بازگشت است!")) return;
+             if (!confirm("اخطار نهایی: با کلیک بر روی OK، تمام آمار لیگ پاک می‌شود. ادامه می‌دهید؟")) return;
+
+             matchHistory = [];
+             resetLeagueStats();
+
+             const successHistory = await saveMatchHistoryToGitHub(matchHistory, 'Admin: Full league reset.');
+             const successLeague = await saveLeagueDataToGitHub(leagueData, 'Admin: Full league reset.');
+
+             if (successHistory && successLeague) {
+                 alert("لیگ به طور کامل بازنشانی شد.");
+                 hideAdminOptionsModal();
+                 renderLeagueTable(leagueData);
+             } else {
+                 alert("خطا در بازنشانی لیگ.");
+             }
+        }
+        
+        function renderAdminHistory() {
+             const historyListElement = document.getElementById('admin-history-list');
+
+             if (matchHistory.length === 0) {
+                 historyListElement.innerHTML = '<div class="text-center text-gray-400 p-4">هنوز بازی ثبت نشده است.</div>';
+                 return;
+             }
+
+             const historyHtml = matchHistory.map((match, index) => {
+                 const homeName = TEAM_DISPLAY_NAMES[match.home] || match.home;
+                 const awayName = TEAM_DISPLAY_NAMES[match.away] || match.away;
+                 
+                 return `
+                    <div class="admin-match-item hover:bg-gray-600 transition duration-150 rounded">
+                        <span class="font-semibold text-white text-sm">
+                             ${homeName} <span class="text-purple-300 mx-1">${match.score}</span> ${awayName}
+                        </span>
+                        <div>
+                             <button class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs" 
+                                     onclick="deleteMatch(${index})">
+                                 <i class="fas fa-trash"></i> حذف
+                             </button>
+                        </div>
+                    </div>
+                 `;
+             }).join('');
+             
+             historyListElement.innerHTML = historyHtml;
         }
 
         // ----------------------------------------------------
@@ -338,13 +485,16 @@
                     targetScreen.style.display = 'flex';
                     updateDateTime();
                     document.getElementById('loading-message').style.display = 'block';
-                    loadLeagueDataFromGitHub().then(renderLeagueTable);
+                    // load both league data and history before rendering table
+                    Promise.all([loadLeagueDataFromGitHub(), loadMatchHistoryFromGitHub()]).then(([leagueDataResult]) => {
+                        renderLeagueTable(leagueDataResult);
+                    });
                     break;
-                // ✅ NEW: تاریخچه بازی‌ها
                 case 'history':
                     targetScreen = document.getElementById('match-history-screen');
                     targetScreen.style.display = 'flex';
                     document.getElementById('history-loading').style.display = 'block';
+                    // Load history then render
                     loadMatchHistoryFromGitHub().then(renderMatchHistory);
                     break;
             }
@@ -370,7 +520,7 @@
         }
 
         // ----------------------------------------------------
-        // *** LEAGUE TABLE LOGIC (UPDATED FOR DISPLAY) ***
+        // *** LEAGUE TABLE LOGIC ***
         // ----------------------------------------------------
 
         function initializeLeagueData() {
@@ -397,7 +547,6 @@
              
              document.getElementById('loading-message').style.display = 'none';
 
-             // ✅ UPDATED: اضافه شدن تفاضل، گل زده و گل خورده به رندر
              tableBody.innerHTML = calculatedTable.map((team, index) => `
                 <div class="team-row text-center hover:bg-gray-800 transition duration-150">
                     <div class="team-rank">${index + 1}</div>
@@ -464,38 +613,43 @@
 
             if(confirm(`آیا از ثبت نتیجه ${displayHomeName} ${homeScore} - ${awayScore} ${displayAwayName} اطمینان دارید؟`)){
 
+                const oldLeagueData = JSON.parse(JSON.stringify(leagueData));
+                const oldMatchHistory = JSON.parse(JSON.stringify(matchHistory));
+                
                 const homeTeam = leagueData[homeTeamName];
                 const awayTeam = leagueData[awayTeamName];
                 
-                // Update stats
+                // Update stats locally
                 updateTeamStats(homeTeam, homeScore, awayScore);
                 updateTeamStats(awayTeam, awayScore, homeScore);
                 
-                // ✅ NEW: ذخیره جزئیات بازی در تاریخچه
+                // Save match detail to history
                 const matchDetail = {
                     home: homeTeamName,
                     away: awayTeamName,
                     score: `${homeScore}-${awayScore}`,
                     timestamp: new Date().toISOString()
                 };
-                matchHistory.unshift(matchDetail); // اضافه کردن به ابتدای آرایه (جدیدترین بالا)
+                matchHistory.unshift(matchDetail); 
                 
                 const successLeague = await saveLeagueDataToGitHub(leagueData, `Match Result: ${homeTeamName} ${homeScore}-${awayScore} ${awayTeamName}`);
                 const successHistory = await saveMatchHistoryToGitHub(matchHistory, `Add Match: ${matchDetail.score}`);
-
 
                 if (successLeague && successHistory) {
                     hideRegistrationModal();
                     renderLeagueTable(leagueData);
                     alert("نتیجه بازی و تاریخچه با موفقیت ثبت و ذخیره شد.");
                 } else {
+                    // Revert local data if saving fails
+                    leagueData = oldLeagueData;
+                    matchHistory = oldMatchHistory;
                     alert("خطا در ذخیره‌سازی! لطفاً توکن گیت‌هاب و وضعیت فایل‌ها را بررسی کنید.");
                 }
             }
         }
 
         // ----------------------------------------------------
-        // *** MATCH HISTORY LOGIC (NEW) ***
+        // *** MATCH HISTORY LOGIC ***
         // ----------------------------------------------------
 
         function renderMatchHistory(history) {
@@ -511,9 +665,7 @@
                 const homeName = TEAM_DISPLAY_NAMES[match.home] || match.home;
                 const awayName = TEAM_DISPLAY_NAMES[match.away] || match.away;
                 
-                // فرمت کردن زمان شمسی
                 const date = new persianDate(new Date(match.timestamp)).format('dddd YYYY/MM/DD');
-                // فرمت کردن زمان میلادی به وقت تهران
                 const time = new Date(match.timestamp).toLocaleTimeString("fa-IR", { timeZone: "Asia/Tehran", hour: '2-digit', minute: '2-digit', hour12: false });
                 
                 return `
@@ -534,7 +686,7 @@
         }
 
         // ----------------------------------------------------
-        // *** GITHUB API INTERACTION (UPDATED/NEW) ***
+        // *** GITHUB API INTERACTION ***
         // ----------------------------------------------------
 
         const BASE_API_URL = `https://api.github.com/repos/${GITHUB_REPO}/contents/`;
@@ -553,7 +705,6 @@
              return TOKEN;
         }
         
-        // Loads league data from the specified GitHub file and branch
         async function loadLeagueDataFromGitHub() {
             if (Object.keys(leagueData).length === 0) {
                  initializeLeagueData();
@@ -590,7 +741,6 @@
             }
         }
         
-        // NEW: Loads match history from GitHub
         async function loadMatchHistoryFromGitHub() {
             const token = await getGitHubToken();
             if (!token) return [];
@@ -606,6 +756,7 @@
                     return matchHistory;
                 } else if (response.status === 404) {
                     console.log("Match history file not found. Initializing empty history.");
+                    // Attempt initial save to create the file if it doesn't exist
                     await saveMatchHistoryToGitHub([], 'Initial commit: created match history file.');
                     return [];
                 }
@@ -616,7 +767,6 @@
             }
         }
         
-        // Saves league data back to GitHub
         async function saveLeagueDataToGitHub(data, commitMessage) {
             const TOKEN = localStorage.getItem('github_pat');
             if (!TOKEN) return false;
@@ -659,7 +809,6 @@
             }
         }
 
-        // NEW: Saves match history to GitHub
         async function saveMatchHistoryToGitHub(data, commitMessage) {
             const TOKEN = localStorage.getItem('github_pat');
             if (!TOKEN) return false;
@@ -697,11 +846,7 @@
             }
         }
         
-        // --- Modal & Time Logic ---
-        
-        function hideRegistrationModal() { 
-            document.getElementById('match-registration-modal').style.display = 'none'; 
-        }
+        // --- Time Logic ---
         
         function updateDateTime() {
             const now = new Date();
@@ -716,6 +861,25 @@
         initializeLeagueData();
         
         document.addEventListener('DOMContentLoaded', () => {
+            // Add Admin button dynamically
+            const leagueHeaderContainer = document.querySelector('#league-table-screen .league-header .flex');
+            if(leagueHeaderContainer) {
+                 const registerButton = document.createElement('button');
+                 registerButton.className = 'bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg text-sm ml-2';
+                 registerButton.innerHTML = '<i class="fas fa-plus ml-1"></i> ثبت نتیجه جدید';
+                 registerButton.onclick = showRegistrationModal;
+                 
+                 const adminButton = document.createElement('button');
+                 adminButton.className = 'bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-lg text-sm';
+                 adminButton.innerHTML = '<i class="fas fa-user-shield ml-1"></i> مدیریت بازی‌ها';
+                 adminButton.onclick = showAdminOptionsModal;
+                 
+                 // Insert them before the 'Back' button
+                 const backButton = leagueHeaderContainer.querySelector('button');
+                 leagueHeaderContainer.insertBefore(registerButton, backButton);
+                 leagueHeaderContainer.insertBefore(adminButton, registerButton);
+            }
+
             updateDateTime();
             setInterval(updateDateTime, 1000); 
             startApp();
