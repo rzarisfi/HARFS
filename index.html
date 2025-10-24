@@ -292,7 +292,11 @@
         const GITHUB_LEAGUE_FILE = "league_data.json";
         const GITHUB_MATCHES_FILE = "match_history.json"; 
         
-        // ⚠️ NEW: رمز عبور ادمین (لطفاً این را به یک رمز قوی تغییر دهید!)
+        // 🚨 خطرناک: توکن گیت‌هاب شما مستقیماً در سورس کد قرار گرفت.
+        // توصیه می‌شود این مقدار را پس از اتمام کار پاک کنید.
+        const DIRECT_GITHUB_PAT = "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"; 
+
+        // ⚠️ NEW: رمز عبور ادمین
         const ADMIN_PASSWORD = "harfsadmin123"; 
 
         // Global Team List (English keys)
@@ -333,7 +337,6 @@
         
         function showAdminOptionsModal() {
              if (!checkAdminAccess()) return;
-             // قبل از باز کردن، تاریخچه را از نو رندر می‌کنیم
              renderAdminHistory();
              document.getElementById('admin-options-modal').style.display = 'flex';
         }
@@ -367,14 +370,11 @@
         function recalculateLeagueFromHistory() {
             resetLeagueStats(); 
             
-            // Loop through all matches in the history
             matchHistory.forEach(match => {
                 const [homeScore, awayScore] = match.score.split('-').map(Number);
 
                 if (leagueData[match.home] && leagueData[match.away]) {
-                    // Update stats for home team
                     updateTeamStats(leagueData[match.home], homeScore, awayScore);
-                    // Update stats for away team
                     updateTeamStats(leagueData[match.away], awayScore, homeScore);
                 }
             });
@@ -383,23 +383,17 @@
         async function deleteMatch(index) {
              if (!confirm("آیا مطمئن هستید که می‌خواهید این بازی را حذف کنید؟ این عمل غیرقابل بازگشت است.")) return;
              
-             // 1. Remove the match from local history
              matchHistory.splice(index, 1);
              
-             // 2. Save the new history array to GitHub
              const successHistory = await saveMatchHistoryToGitHub(matchHistory, `Admin: Deleted match at index ${index}`);
 
              if (successHistory) {
-                 // 3. Recalculate all league stats from the updated history
                  recalculateLeagueFromHistory();
-                 
-                 // 4. Save the new league stats to GitHub
                  const successLeague = await saveLeagueDataToGitHub(leagueData, 'Admin: Recalculated league stats after deletion.');
                  
                  if (successLeague) {
                      alert("بازی با موفقیت حذف و جدول لیگ بازنشانی شد.");
                      hideAdminOptionsModal();
-                     // Refresh the league view
                      renderLeagueTable(leagueData); 
                  } else {
                      alert("خطا در ذخیره‌سازی آمار لیگ پس از حذف. لطفاً توکن را بررسی کنید.");
@@ -485,16 +479,22 @@
                     targetScreen.style.display = 'flex';
                     updateDateTime();
                     document.getElementById('loading-message').style.display = 'block';
-                    // load both league data and history before rendering table
-                    Promise.all([loadLeagueDataFromGitHub(), loadMatchHistoryFromGitHub()]).then(([leagueDataResult]) => {
-                        renderLeagueTable(leagueDataResult);
-                    });
+                    
+                    // ✅ اصلاح: اطمینان از بارگذاری داده‌ها در هر بار ناوبری به صفحه لیگ
+                    Promise.all([loadLeagueDataFromGitHub(), loadMatchHistoryFromGitHub()])
+                        .then(([leagueDataResult]) => {
+                            renderLeagueTable(leagueDataResult);
+                        })
+                        .catch(error => {
+                            console.error("Error loading league data on navigation:", error);
+                            document.getElementById('loading-message').textContent = "خطا در بارگذاری داده‌ها. توکن گیت‌هاب را بررسی کنید.";
+                            renderLeagueTable(leagueData);
+                        });
                     break;
                 case 'history':
                     targetScreen = document.getElementById('match-history-screen');
                     targetScreen.style.display = 'flex';
                     document.getElementById('history-loading').style.display = 'block';
-                    // Load history then render
                     loadMatchHistoryFromGitHub().then(renderMatchHistory);
                     break;
             }
@@ -562,7 +562,6 @@
                 </div>
              `).join('');
              
-             // Populate team selectors
              const homeSelect = document.getElementById('home-team-select');
              const awaySelect = document.getElementById('away-team-select');
              
@@ -619,11 +618,9 @@
                 const homeTeam = leagueData[homeTeamName];
                 const awayTeam = leagueData[awayTeamName];
                 
-                // Update stats locally
                 updateTeamStats(homeTeam, homeScore, awayScore);
                 updateTeamStats(awayTeam, awayScore, homeScore);
                 
-                // Save match detail to history
                 const matchDetail = {
                     home: homeTeamName,
                     away: awayTeamName,
@@ -640,7 +637,6 @@
                     renderLeagueTable(leagueData);
                     alert("نتیجه بازی و تاریخچه با موفقیت ثبت و ذخیره شد.");
                 } else {
-                    // Revert local data if saving fails
                     leagueData = oldLeagueData;
                     matchHistory = oldMatchHistory;
                     alert("خطا در ذخیره‌سازی! لطفاً توکن گیت‌هاب و وضعیت فایل‌ها را بررسی کنید.");
@@ -686,23 +682,18 @@
         }
 
         // ----------------------------------------------------
-        // *** GITHUB API INTERACTION ***
+        // *** GITHUB API INTERACTION (Token Direct Access) ***
         // ----------------------------------------------------
 
         const BASE_API_URL = `https://api.github.com/repos/${GITHUB_REPO}/contents/`;
         
+        // ✅ استفاده مستقیم از توکن قرار داده شده در کد
         async function getGitHubToken() {
-             let TOKEN = localStorage.getItem('github_pat');
-            
-             if (!TOKEN) {
-                 TOKEN = prompt("لطفاً GitHub Personal Access Token خود را وارد کنید (باید مجوز repo داشته باشد):");
-                 if (!TOKEN) {
-                      alert("برای ذخیره‌سازی، به توکن GitHub نیاز است.");
-                      return null;
-                 }
-                 localStorage.setItem('github_pat', TOKEN);
+             if (DIRECT_GITHUB_PAT) {
+                 return DIRECT_GITHUB_PAT;
              }
-             return TOKEN;
+             alert("توکن گیت‌هاب در کد تنظیم نشده است.");
+             return null;
         }
         
         async function loadLeagueDataFromGitHub() {
@@ -737,6 +728,7 @@
                 throw new Error(`Failed to fetch league data: ${response.statusText} (${response.status})`);
             } catch (error) {
                 console.error("Error in loadLeagueDataFromGitHub:", error);
+                // Fallback to local data on error
                 return leagueData; 
             }
         }
@@ -756,7 +748,6 @@
                     return matchHistory;
                 } else if (response.status === 404) {
                     console.log("Match history file not found. Initializing empty history.");
-                    // Attempt initial save to create the file if it doesn't exist
                     await saveMatchHistoryToGitHub([], 'Initial commit: created match history file.');
                     return [];
                 }
@@ -768,7 +759,7 @@
         }
         
         async function saveLeagueDataToGitHub(data, commitMessage) {
-            const TOKEN = localStorage.getItem('github_pat');
+            const TOKEN = await getGitHubToken();
             if (!TOKEN) return false;
 
             const dataToSave = {};
@@ -801,7 +792,6 @@
                     sha = responseData.content.sha;
                     return true;
                 } else {
-                    if(response.status === 401 || response.status === 403) { localStorage.removeItem('github_pat'); }
                     return false;
                 }
             } catch (error) {
@@ -810,7 +800,7 @@
         }
 
         async function saveMatchHistoryToGitHub(data, commitMessage) {
-            const TOKEN = localStorage.getItem('github_pat');
+            const TOKEN = await getGitHubToken();
             if (!TOKEN) return false;
 
             const content = JSON.stringify(data, null, 2);
@@ -838,7 +828,6 @@
                     matchesSha = responseData.content.sha;
                     return true;
                 } else {
-                    if(response.status === 401 || response.status === 403) { localStorage.removeItem('github_pat'); }
                     return false;
                 }
             } catch (error) {
@@ -874,7 +863,6 @@
                  adminButton.innerHTML = '<i class="fas fa-user-shield ml-1"></i> مدیریت بازی‌ها';
                  adminButton.onclick = showAdminOptionsModal;
                  
-                 // Insert them before the 'Back' button
                  const backButton = leagueHeaderContainer.querySelector('button');
                  leagueHeaderContainer.insertBefore(registerButton, backButton);
                  leagueHeaderContainer.insertBefore(adminButton, registerButton);
