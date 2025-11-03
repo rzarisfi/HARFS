@@ -398,19 +398,14 @@
                 </div>
             </div>
             
-            <button class="mt-5 bg-gray-700 hover:bg-gray-600 p-3 rounded-lg" onclick="navigate('menu')">
-                <i class="fas fa-chevron-left mr-2"></i> Back to Menu
+            <button class="mt-5 bg-gray-700 hover:bg-gray-600 p-2 rounded-lg text-sm font-semibold" onclick="navigate('menu')">
+                <i class="fas fa-chevron-left mr-1"></i> Back to Menu
             </button>
         </div>
         
         <div id="league-table-screen" class="page-screen">
             <div class="league-header">
-                <div class="flex justify-between items-center mb-4">
-                    <button class="text-gray-400 hover:text-white text-xl" onclick="navigate('menu')">
-                        <i class="fas fa-chevron-left mr-2"></i> Back
-                    </button>
-                    <h2 class="text-2xl font-bold text-center text-blue-300">Complete League Table</h2>
-                </div>
+                <h2 class="text-2xl font-bold text-blue-300 text-center mb-4">Complete League Table</h2> 
                 
                 <div class="text-center text-sm text-gray-400" id="current-datetime">Loading...</div>
                 
@@ -433,16 +428,15 @@
                     </div>
                 <div id="loading-message" class="text-center text-gray-500 mt-10">Loading league data...</div>
             </div>
+            
+            <button class="mt-5 mb-5 bg-gray-700 hover:bg-gray-600 p-2 rounded-lg text-sm font-semibold flex-shrink-0" onclick="navigate('menu')">
+                <i class="fas fa-chevron-left mr-1"></i> Back to Menu
+            </button>
         </div>
         
         <div id="match-history-screen" class="page-screen">
             <div class="league-header">
-                <div class="flex justify-between items-center mb-4">
-                    <button class="text-gray-400 hover:text-white text-xl" onclick="navigate('menu')">
-                        <i class="fas fa-chevron-left mr-2"></i> Back
-                    </button>
-                    <h2 class="text-2xl font-bold text-center text-blue-300">Complete Match History</h2>
-                </div>
+                <h2 class="text-2xl font-bold text-blue-300 text-center mb-4">Complete Match History</h2> 
             </div>
             
             <div class="w-full px-4">
@@ -450,6 +444,10 @@
                     <div id="history-loading" class="text-center text-gray-500 mt-10">Loading history...</div>
                 </div>
             </div>
+            
+            <button class="mt-5 mb-5 bg-gray-700 hover:bg-gray-600 p-2 rounded-lg text-sm font-semibold flex-shrink-0" onclick="navigate('menu')">
+                <i class="fas fa-chevron-left mr-1"></i> Back to Menu
+            </button>
         </div>
         
         <div id="match-registration-modal">
@@ -507,22 +505,91 @@
                 </div>
             </div>
         </div>
-
-    </div>
-</div>
-            </div>
-        </div>
         
         <div class="absolute bottom-0 w-full max-w-sm p-2 text-center text-xs text-gray-500 z-50">
             Powered by <i class="fas fa-heart text-red-600 animate-pulse"></i>
         </div>
-        </div>
+    </div>
+
     <audio id="background-music" loop style="display: none;">
         <source src="https://raw.githubusercontent.com/rzarisfi/HarfsMusic/league-data/HARFS_background.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
     <script>
+        // ** شروع کد جدید: توابع تاریخ شمسی **
+
+        // 1. لیست ماه‌های شمسی به انگلیسی برای نمایش
+        const J_MONTHS_EN = [
+            "Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar", 
+            "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"
+        ];
+
+        // 2. تابع کمکی برای تبدیل ارقام فارسی به انگلیسی (ضروری برای پردازش تاریخ)
+        function toEnglishDigits(str) {
+            if (!str) return str;
+            return str.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+        }
+
+        // 3. تابع اصلی به‌روزرسانی تاریخ شمسی و زمان (با ثانیه‌شمار برای هدر)
+        function updateCurrentDateTime() {
+            const now = new Date();
+            // ✅ اضافه شدن ثانیه‌شمار
+            const localTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+            // 1. گرفتن تاریخ شمسی با ارقام فارسی
+            const faDateString = now.toLocaleDateString('fa-IR', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            
+            // 2. تبدیل ارقام فارسی به انگلیسی برای پردازش
+            const enDateString = toEnglishDigits(faDateString);
+            
+            // 3. جداسازی اجزای تاریخ
+            const parts = enDateString.split('/');
+            const J_YEAR = parts[0]; // سال شمسی
+            const J_MONTH_NUM = parseInt(parts[1], 10); // شماره ماه شمسی (1 تا 12)
+            const J_DAY = parts[2]; // روز شمسی
+
+            // 4. یافتن نام ماه شمسی به انگلیسی
+            const J_MONTH_NAME = J_MONTHS_EN[J_MONTH_NUM - 1] || 'Unknown';
+            
+            // 5. گرفتن نام روز هفته به انگلیسی (مانند Mon, Tue)
+            const J_WEEKDAY_EN = now.toLocaleDateString("en-US", { weekday: 'short' });
+
+            // 6. ساخت رشته نهایی تاریخ با فرمت مورد نظر شما: 12Aban1404    Mon
+            const solarDateFinal = `${J_DAY}${J_MONTH_NAME}${J_YEAR}    ${J_WEEKDAY_EN}`;
+            
+            // به‌روز رسانی المان HTML
+            document.getElementById('current-datetime').textContent = `${solarDateFinal} - Time: ${localTime}`;
+        }
+        
+        // 4. تابع کمکی برای فرمت دهی تاریخ شمسی از روی Timestamp (برای Match History)
+        function formatShamsiDateTime(timestamp) {
+            const now = new Date(timestamp);
+            
+            // Time with seconds
+            const localTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+            // Date conversion
+            const faDateString = now.toLocaleDateString('fa-IR', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            const enDateString = toEnglishDigits(faDateString);
+            const parts = enDateString.split('/');
+            const J_YEAR = parts[0]; 
+            const J_MONTH_NUM = parseInt(parts[1], 10); 
+            const J_DAY = parts[2]; 
+            const J_MONTH_NAME = J_MONTHS_EN[J_MONTH_NUM - 1] || 'Unknown';
+            const J_WEEKDAY_EN = now.toLocaleDateString("en-US", { weekday: 'short' });
+
+            // Format: 12Aban1404 Mon
+            const solarDateFinal = `${J_DAY}${J_MONTH_NAME}${J_YEAR}    ${J_WEEKDAY_EN}`;
+
+            return {
+                date: solarDateFinal,
+                time: localTime
+            };
+        }
+        
+        // ** پایان کد جدید: توابع تاریخ شمسی **
+        
         // ----------------------------------------------------
         // *** GLOBAL CONFIGURATION (FINAL SECURE) ***
         // ----------------------------------------------------
@@ -728,8 +795,6 @@
         
         // NOTE: Chat input and send button are intentionally blurred and inactive
         // due to the 'Under Development' overlay.
-        // The JavaScript logic for sending messages is left here for future implementation,
-        // but it will not be triggered while the overlay is active.
         
         const chatMessagesDiv = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
@@ -823,7 +888,7 @@
                 case 'league':
                     targetScreen = document.getElementById('league-table-screen');
                     targetScreen.style.display = 'flex';
-                    updateDateTime();
+                    updateCurrentDateTime(); // ✅ به‌روزرسانی تاریخ شمسی هدر
                     document.getElementById('loading-message').style.display = 'block';
                     
                     // Public READ access (no token needed here)
@@ -1012,9 +1077,10 @@
                 const homeName = TEAM_DISPLAY_NAMES[match.home] || match.home;
                 const awayName = TEAM_DISPLAY_NAMES[match.away] || match.away;
                 
-                // Using standard date formatting for English UI
-                const date = new Date(match.timestamp).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
-                const time = new Date(match.timestamp).toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', hour12: true });
+                // ✅ استفاده از تابع شمسی‌سازی برای نمایش تاریخ و زمان دقیق
+                const formattedDate = formatShamsiDateTime(match.timestamp);
+                const date = formattedDate.date;
+                const time = formattedDate.time;
                 
                 return `
                     <div class="p-4 bg-gray-800 rounded-lg shadow-md border-r-4 border-blue-500 text-sm">
@@ -1216,26 +1282,15 @@
             }
         }
         
-        // --- Time Logic ---
-        
-        function updateDateTime() {
-            const now = new Date();
-            const localTime = now.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-            const localDate = now.toLocaleDateString("en-US", { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-            
-            document.getElementById('current-datetime').textContent = `${localDate} - Time: ${localTime}`;
-        }
-        
         // --- FINAL APP STARTUP ---
+        
         initializeLeagueData();
         
         document.addEventListener('DOMContentLoaded', () => {
-            updateDateTime();
-            setInterval(updateDateTime, 1000); 
+            updateCurrentDateTime();
+            setInterval(updateCurrentDateTime, 1000);
             startApp();
         });
     </script>
 </body>
 </html>
-
-
