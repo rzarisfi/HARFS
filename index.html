@@ -57,9 +57,14 @@
         #menu-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
             display: none; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s; opacity: 0; background: transparent; direction: ltr; /* Changed to LTR */
+            background: transparent; direction: ltr; /* Changed to LTR */
+            /* MODIFIED: Added transition and opacity 0 for dynamic navigation */
+            transition: opacity 0.4s ease-out;
+            opacity: 0; 
         }
-        #menu-screen.active { display: flex; opacity: 1; }
+        #menu-screen.active { 
+            display: flex; opacity: 1; 
+        }
         .menu-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 400px; margin-top: 30px;
         }
@@ -100,6 +105,13 @@
             padding: 20px 0; 
             box-sizing: border-box;
             overflow-y: auto;
+            /* MODIFIED: Added transition and opacity 0 for dynamic navigation */
+            transition: opacity 0.4s ease-out;
+            opacity: 0;
+        }
+        /* NEW: Active class for dynamic navigation */
+        .page-screen.active {
+            opacity: 1;
         }
         
         /* --- Chat Coach Styles --- */
@@ -311,6 +323,58 @@
         .team-pts { font-weight: bold; color: #ffeb3b; font-size: 1rem; } 
         .team-rank { font-weight: 700; color: #60a5fa; text-align: center; }
 
+        /* --- NEW: Team Profile Screen Styles --- */
+        .profile-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .stat-item {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #a7b7e6; /* Light blue/gray */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+            margin-top: 4px;
+        }
+        /* Special styles for key stats */
+        .stat-item-pts {
+            background: #1e3a8a; /* Primary color */
+        }
+        .stat-item-pts .stat-value {
+            color: #ffeb3b; /* Yellow */
+        }
+        .stat-item-gd {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
         /* Modal Styles (No Major Change) */
         #match-registration-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85);
@@ -341,6 +405,8 @@
             background-color: #f0f0f0; 
             border: none;
         }
+
+        /* DELETED: Logo Modal Animation Styles */
     </style>
 </head>
 <body>
@@ -350,7 +416,7 @@
 
     <div class="app-container hidden" id="app-container">
         
-        <div id="menu-screen">
+        <div id="menu-screen" style="display: none;">
             <h1 class="text-3xl font-bold text-blue-400">Menu</h1>
             
             <div class="menu-grid">
@@ -373,10 +439,10 @@
             </div>
         </div>
 
-        <div id="chat-coach-view" class="page-screen">
+        <div id="chat-coach-view" class="page-screen" style="display: none;">
             <div class="chat-card">
                 <div class="chat-header">
-                    <img src="https://raw.githubusercontent.com/rzarisfi/HarfsMusic/league-data/coach_placeholder.png" alt="Coach Avatar">
+                    <img src="https="raw.githubusercontent.com/rzarisfi/HarfsMusic/league-data/coach_placeholder.png" alt="Coach Avatar">
                     <h3>Chat with Coaches</h3>
                 </div>
                 <div class="chat-messages" id="chat-messages">
@@ -403,7 +469,7 @@
             </button>
         </div>
         
-        <div id="league-table-screen" class="page-screen">
+        <div id="league-table-screen" class="page-screen" style="display: none;">
             <div class="league-header">
                 <h2 class="text-2xl font-bold text-blue-300 text-center mb-4">Complete League Table</h2> 
                 
@@ -434,7 +500,7 @@
             </button>
         </div>
         
-        <div id="match-history-screen" class="page-screen">
+        <div id="match-history-screen" class="page-screen" style="display: none;">
             <div class="league-header">
                 <h2 class="text-2xl font-bold text-blue-300 text-center mb-4">Complete Match History</h2> 
             </div>
@@ -450,7 +516,56 @@
             </button>
         </div>
         
-        <div id="match-registration-modal">
+        <div id="team-profile-screen" class="page-screen" style="display: none;">
+            <div class="profile-card">
+                <img id="profile-team-logo" src="" alt="Team Logo" 
+                     class="w-32 h-32 object-contain rounded-2xl shadow-2xl border-4 border-blue-500 bg-black bg-opacity-20">
+                
+                <h2 id="profile-team-name" class="text-3xl font-bold text-white mt-4">Team Name</h2>
+                
+                <div class="stat-grid">
+                    <div class="stat-item stat-item-pts">
+                        <div class="stat-label">Points</div>
+                        <div id="profile-stat-pts" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-item stat-item-gd">
+                        <div class="stat-label">Goal Diff.</div>
+                        <div id="profile-stat-gd" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Played</div>
+                        <div id="profile-stat-p" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Wins</div>
+                        <div id="profile-stat-w" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Draws</div>
+                        <div id="profile-stat-d" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Losses</div>
+                        <div id="profile-stat-l" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Goals For</div>
+                        <div id="profile-stat-gf" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Goals Against</div>
+                        <div id="profile-stat-ga" class="stat-value">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="mt-5 mb-5 bg-gray-700 hover:bg-gray-600 p-2 rounded-lg text-sm font-semibold flex-shrink-0" onclick="navigate('league')">
+                <i class="fas fa-chevron-left mr-1"></i> Back to League Table
+            </button>
+        </div>
+        
+        
+        <div id="match-registration-modal" style="display: none;">
             <div class="modal-content">
                 <h3 class="text-xl font-bold mb-4 text-blue-400">Register Match Result</h3>
                 
@@ -487,7 +602,7 @@
             </div>
         </div>
         
-        <div id="admin-options-modal">
+        <div id="admin-options-modal" style="display: none;">
             <div class="modal-content">
                 <h3 class="text-xl font-bold mb-4 text-blue-400">Match Management Panel</h3>
                 
@@ -694,6 +809,11 @@
         }
 
         // ----------------------------------------------------
+        // *** TEAM LOGO MODAL LOGIC (DELETED) ***
+        // ----------------------------------------------------
+        // (All functions like showTeamLogo, hideLogoModal, and their consts are removed)
+
+        // ----------------------------------------------------
         // *** LEAGUE RECALCULATION & MANAGEMENT ***
         // ----------------------------------------------------
         
@@ -864,52 +984,69 @@
 
 
         // ----------------------------------------------------
-        // *** CORE APP & NAVIGATION LOGIC ***
+        // *** CORE APP & NAVIGATION LOGIC (MODIFIED FOR ANIMATION) ***
         // ----------------------------------------------------
         
         function navigate(route) {
-            document.querySelectorAll('.page-screen').forEach(screen => {
-                screen.style.display = 'none';
-            });
-            document.getElementById('menu-screen').classList.remove('active');
-            document.getElementById('menu-screen').style.display = 'none'; 
+            const allScreens = document.querySelectorAll('.page-screen, #menu-screen');
+            let targetScreenId = '';
 
-            let targetScreen;
             switch(route) {
-                case 'menu':
-                    targetScreen = document.getElementById('menu-screen');
-                    targetScreen.style.display = 'flex';
-                    setTimeout(() => targetScreen.classList.add('active'), 50);
-                    break;
-                case 'chat':
-                    targetScreen = document.getElementById('chat-coach-view');
-                    targetScreen.style.display = 'flex';
-                    // The overlay is always present in this version
-                    break;
-                case 'league':
-                    targetScreen = document.getElementById('league-table-screen');
-                    targetScreen.style.display = 'flex';
-                    updateCurrentDateTime(); // ✅ به‌روزرسانی تاریخ شمسی هدر
-                    document.getElementById('loading-message').style.display = 'block';
+                case 'menu':    targetScreenId = 'menu-screen'; break;
+                case 'chat':    targetScreenId = 'chat-coach-view'; break;
+                case 'league':  targetScreenId = 'league-table-screen'; break;
+                case 'history': targetScreenId = 'match-history-screen'; break;
+                case 'team-profile': targetScreenId = 'team-profile-screen'; break; // NEW route
+            }
+
+            const targetScreen = document.getElementById(targetScreenId);
+
+            // 1. Hide all other screens
+            allScreens.forEach(screen => {
+                if (screen.id !== targetScreenId && screen.classList.contains('active')) {
+                    screen.classList.remove('active');
                     
-                    // Public READ access (no token needed here)
-                    Promise.all([loadLeagueDataFromGitHub(), loadMatchHistoryFromGitHub()])
-                        .then(([leagueDataResult]) => {
-                            renderLeagueTable(leagueDataResult);
-                        })
-                        .catch(error => {
-                            console.error("Error loading league data on navigation:", error);
-                            document.getElementById('loading-message').textContent = "Error loading data. Ensure JSON files exist on GitHub.";
-                            renderLeagueTable(leagueData);
-                        });
-                    break;
-                case 'history':
-                    targetScreen = document.getElementById('match-history-screen');
-                    targetScreen.style.display = 'flex';
-                    document.getElementById('history-loading').style.display = 'block';
-                    // Public READ access (no token needed here)
-                    loadMatchHistoryFromGitHub().then(renderMatchHistory);
-                    break;
+                    // Set display: none *after* animation
+                    setTimeout(() => {
+                        // Check again in case user navigated away quickly
+                        if (!screen.classList.contains('active')) {
+                            screen.style.display = 'none';
+                        }
+                    }, 400); // Match CSS transition duration
+                }
+            });
+
+            // 2. Show the target screen
+            if (targetScreen) {
+                // Set display: flex so it's in the DOM for animation
+                targetScreen.style.display = 'flex';
+                
+                // Force a reflow (browser paint) before adding 'active'
+                setTimeout(() => {
+                    targetScreen.classList.add('active');
+                }, 10); // 10ms delay is enough
+            }
+
+            // 3. Load data for specific pages (no change here)
+            if(route === 'league') {
+                updateCurrentDateTime(); // ✅ به‌روزرسانی تاریخ شمسی هدر
+                document.getElementById('loading-message').style.display = 'block';
+                
+                // Public READ access (no token needed here)
+                Promise.all([loadLeagueDataFromGitHub(), loadMatchHistoryFromGitHub()])
+                    .then(([leagueDataResult]) => {
+                        renderLeagueTable(leagueDataResult);
+                    })
+                    .catch(error => {
+                        console.error("Error loading league data on navigation:", error);
+                        document.getElementById('loading-message').textContent = "Error loading data. Ensure JSON files exist on GitHub.";
+                        renderLeagueTable(leagueData);
+                    });
+            }
+            if(route === 'history') {
+                document.getElementById('history-loading').style.display = 'block';
+                // Public READ access (no token needed here)
+                loadMatchHistoryFromGitHub().then(renderMatchHistory);
             }
         }
         
@@ -931,6 +1068,36 @@
         // ----------------------------------------------------
         // *** LEAGUE TABLE LOGIC ***
         // ----------------------------------------------------
+        
+        // NEW Function: Show Team Profile Page
+        function showTeamProfile(teamKey) {
+            const teamData = leagueData[teamKey];
+            if (!teamData) {
+                console.error("Team data not found:", teamKey);
+                return;
+            }
+            
+            const displayName = TEAM_DISPLAY_NAMES[teamKey] || teamKey;
+            
+            // Populate Logo and Name
+            document.getElementById('profile-team-logo').src = `${GITHUB_IMAGE_BASE_URL}${teamKey}.png`;
+            document.getElementById('profile-team-logo').alt = `${displayName} Logo`;
+            document.getElementById('profile-team-name').textContent = displayName;
+            
+            // Populate Stats
+            document.getElementById('profile-stat-p').textContent = teamData.P;
+            document.getElementById('profile-stat-w').textContent = teamData.W;
+            document.getElementById('profile-stat-d').textContent = teamData.D;
+            document.getElementById('profile-stat-l').textContent = teamData.L;
+            document.getElementById('profile-stat-gf').textContent = teamData.GF;
+            document.getElementById('profile-stat-ga').textContent = teamData.GA;
+            document.getElementById('profile-stat-gd').textContent = teamData.GF - teamData.GA;
+            document.getElementById('profile-stat-pts').textContent = teamData.Pts;
+            
+            // Navigate to the new page
+            navigate('team-profile');
+        }
+
 
         function calculateLeagueTable() {
             const table = Object.values(leagueData).sort((a, b) => {
@@ -954,7 +1121,7 @@
                  const displayName = TEAM_DISPLAY_NAMES[team.name] || team.name;
 
                  return `
-                    <div class="team-row text-center hover:bg-gray-800 transition duration-150">
+                    <div class="team-row text-center hover:bg-gray-800 transition duration-150 cursor-pointer" data-team-key="${team.name}">
                         <div class="team-rank">${index + 1}</div>
                         
                         <div class="team-name text-left pl-2 flex items-center">
@@ -975,6 +1142,15 @@
                     </div>
                  `;
              }).join('');
+             
+             // ** MODIFIED: Attach dblclick listeners to call new function **
+             tableBody.querySelectorAll('.team-row').forEach(row => {
+                 row.addEventListener('dblclick', function() {
+                     const teamKey = this.getAttribute('data-team-key');
+                     showTeamProfile(teamKey); // Changed from showTeamLogo
+                 });
+             });
+             // ** END MODIFIED **
              
              // Populate team selectors
              const homeSelect = document.getElementById('home-team-select');
