@@ -53,47 +53,82 @@
             100% { opacity: 0.3; } 
         }
         
-        /* --- Menu Screen --- */
+        /* --- Menu Screen (MODIFIED for List View) --- */
         #menu-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
             display: none; flex-direction: column; justify-content: center; align-items: center;
             background: transparent; direction: ltr; /* Changed to LTR */
-            /* MODIFIED: Added transition and opacity 0 for dynamic navigation */
             transition: opacity 0.4s ease-out;
             opacity: 0; 
+            padding: 0 20px; /* Add padding to constrain the list */
         }
         #menu-screen.active { 
             display: flex; opacity: 1; 
         }
-        .menu-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 400px; margin-top: 30px;
-        }
-        /* Enhanced Menu Items (Soft UI Look) */
-        .menu-item {
-            padding: 20px; border-radius: 15px; 
-            background: #1e1e1e; 
-            backdrop-filter: blur(10px);
-            cursor: pointer; 
-            transition: background 0.2s, transform 0.2s, box-shadow 0.3s; 
-            text-align: center;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px;
-            box-shadow: 5px 5px 15px var(--shadow-color), -5px -5px 15px rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-        }
-        .menu-item:hover { 
-            background: #252525; 
-            transform: scale(1.05); 
-            box-shadow: 0 0 25px var(--primary-color); 
-        }
-        .menu-item i { font-size: 3rem; margin-bottom: 10px; color: var(--secondary-color); }
         
+        /* NEW: Menu List Container */
+        .menu-list {
+            width: 100%;
+            max-width: 400px; /* Consistent with old grid */
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Space between list items */
+            margin-top: 30px;
+        }
+
+        /* NEW: Menu List Item Style */
+        .menu-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Pushes icon/text away from chevron */
+            padding: 18px 20px;
+            border-radius: 15px;
+            
+            background: var(--glass-bg); /* Glassmorphism */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px var(--shadow-color);
+            
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .menu-list-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.03); /* Subtle hover effect */
+        }
+
+        .menu-item-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-list-item i.menu-icon {
+            font-size: 1.5rem; /* Smaller icon for list view */
+            color: var(--secondary-color);
+            margin-right: 20px;
+            width: 30px; /* Fixed width for alignment */
+            text-align: center;
+        }
+        
+        .menu-list-item span {
+            font-size: 1.1rem; /* Slightly larger text */
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .menu-list-item i.menu-chevron {
+            font-size: 0.9rem;
+            color: #a7b7e6; /* Lighter color for chevron */
+        }
+
         /* Specific Admin Item Style */
-        .menu-item.admin-item {
-            background-color: #1e3a8a; 
+        .menu-list-item.admin-item {
+            background-color: rgba(30, 58, 138, 0.5); /* Dark blue glass */
             border: 1px solid var(--primary-color);
         }
-        .menu-item.admin-item:hover {
-            background-color: #3b82f6; 
+        .menu-list-item.admin-item:hover {
+            background-color: rgba(59, 130, 246, 0.5); /* Lighter blue glass */
         }
 
         /* --- Screens (Player/League/Chat) --- */
@@ -405,8 +440,6 @@
             background-color: #f0f0f0; 
             border: none;
         }
-
-        /* DELETED: Logo Modal Animation Styles */
     </style>
 </head>
 <body>
@@ -419,26 +452,43 @@
         <div id="menu-screen" style="display: none;">
             <h1 class="text-3xl font-bold text-blue-400">Menu</h1>
             
-            <div class="menu-grid">
-                <div class="menu-item text-xl font-semibold" onclick="navigate('chat')">
-                    <i class="fas fa-comments"></i> 
-                    <span>Chat with Coaches</span>
+            <div class="menu-list">
+                
+                
+                <div class="menu-list-item" onclick="navigate('league')">
+                    <div class="menu-item-content">
+                        <i class="fas fa-futbol menu-icon"></i> 
+                        <span>League Table</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-chevron"></i>
                 </div>
-                <div class="menu-item text-xl font-semibold" onclick="navigate('league')">
-                    <i class="fas fa-futbol"></i> 
-                    <span>League Table</span>
+
+                <div class="menu-list-item" onclick="navigate('history')">
+                    <div class="menu-item-content">
+                        <i class="fas fa-history menu-icon"></i> 
+                        <span>Match History</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-chevron"></i>
                 </div>
-                <div class="menu-item text-xl font-semibold" onclick="navigate('history')">
-                    <i class="fas fa-history"></i> 
-                    <span>Match History</span>
+
+                <div class="menu-list-item admin-item" onclick="showAdminOptions()">
+                    <div class="menu-item-content">
+                        <i class="fas fa-user-shield menu-icon"></i> 
+                        <span>Admin Panel</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-chevron"></i>
                 </div>
-                <div class="menu-item admin-item text-xl font-semibold" onclick="showAdminOptions()">
-                    <i class="fas fa-user-shield"></i> 
-                    <span>Admin Panel (Register/Manage)</span>
+				
+	<!--			<div class="menu-list-item" onclick="navigate('chat')">
+                    <div class="menu-item-content">
+                        <i class="fas fa-comments menu-icon"></i>
+                        <span>Chat with Coaches</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-chevron"></i>
                 </div>
+		-->
             </div>
         </div>
-
         <div id="chat-coach-view" class="page-screen" style="display: none;">
             <div class="chat-card">
                 <div class="chat-header">
@@ -674,7 +724,10 @@
             const solarDateFinal = `${J_DAY}${J_MONTH_NAME}${J_YEAR}    ${J_WEEKDAY_EN}`;
             
             // به‌روز رسانی المان HTML
-            document.getElementById('current-datetime').textContent = `${solarDateFinal} - Time: ${localTime}`;
+            const dtElement = document.getElementById('current-datetime');
+            if (dtElement) {
+                dtElement.textContent = `${solarDateFinal} - Time: ${localTime}`;
+            }
         }
         
         // 4. تابع کمکی برای فرمت دهی تاریخ شمسی از روی Timestamp (برای Match History)
@@ -807,11 +860,6 @@
         function hideRegistrationModal() { 
             document.getElementById('match-registration-modal').style.display = 'none'; 
         }
-
-        // ----------------------------------------------------
-        // *** TEAM LOGO MODAL LOGIC (DELETED) ***
-        // ----------------------------------------------------
-        // (All functions like showTeamLogo, hideLogoModal, and their consts are removed)
 
         // ----------------------------------------------------
         // *** LEAGUE RECALCULATION & MANAGEMENT ***
@@ -950,8 +998,8 @@
         }
 
         // Event Listeners for Chat (will not be active due to pointer-events: none on blurred content)
-        sendChatBtn.addEventListener('click', sendChatMessage);
-        chatInput.addEventListener('keydown', (e) => {
+        if(sendChatBtn) sendChatBtn.addEventListener('click', sendChatMessage);
+        if(chatInput) chatInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 sendChatMessage();
             }
