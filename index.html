@@ -774,10 +774,50 @@
             }
         }
 
+        // --- Start (Fixed for Android/Mobile) ---
         const bgMusic = document.getElementById('background-music');
-        function playAudio() { if(!backgroundMusicStarted && bgMusic) { bgMusic.volume=0.15; bgMusic.play(); backgroundMusicStarted=true; } }
-        document.addEventListener('click', playAudio);
-        document.addEventListener('touchstart', playAudio); // Audio trigger for mobile
+        
+        function initAudio() {
+            if (!backgroundMusicStarted && bgMusic) {
+                bgMusic.volume = 0.15;
+                
+                // متد play در اکثر مرورگرهای موبایل یک Promise برمی‌گرداند
+                let playPromise = bgMusic.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        // پخش با موفقیت شروع شد
+                        backgroundMusicStarted = true;
+                        // حذف شنونده‌ها برای بهینه‌سازی
+                        removeAudioListeners();
+                    }).catch(error => {
+                        // اگر مسدود شد، در لمس بعدی دوباره تلاش می‌کند
+                        console.log("Waiting for user interaction to play audio...");
+                    });
+                }
+            }
+        }
+
+        function removeAudioListeners() {
+            document.removeEventListener('click', initAudio);
+            document.removeEventListener('touchstart', initAudio);
+            document.removeEventListener('mousedown', initAudio);
+        }
+
+        // گوش دادن به تمام حالت‌های ممکن تعامل کاربر در اندروید و ویندوز
+        document.addEventListener('click', initAudio);
+        document.addEventListener('touchstart', initAudio, {passive: true});
+        document.addEventListener('mousedown', initAudio);
+        
+        // مقداردهی اولیه بقیه بخش‌های برنامه
+        initializeLeagueData(); 
+        initializeMainLeagueData();
+        
+        document.addEventListener('DOMContentLoaded', () => { 
+            updateCurrentDateTime(); 
+            setInterval(updateCurrentDateTime, 60000); 
+            startApp(); 
+        });
         
         initializeLeagueData(); initializeMainLeagueData();
         document.addEventListener('DOMContentLoaded', () => { updateCurrentDateTime(); setInterval(updateCurrentDateTime, 60000); startApp(); });
@@ -785,5 +825,6 @@
     </script>
 </body>
 </html>
+
 
 
