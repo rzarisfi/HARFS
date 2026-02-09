@@ -25,7 +25,6 @@
             overflow: hidden;
             padding: 0;
             margin: 0;
-            /* جلوگیری از انتخاب متن در موبایل برای حس اپلیکیشن */
             -webkit-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
@@ -48,7 +47,7 @@
             50% { transform: translate(30px, -50px) scale(1.1); }
         }
 
-        /* --- Global App Container (FIXED FOR MOBILE) --- */
+        /* --- Global App Container --- */
         .app-container {
             width: 100%; 
             height: 100vh; 
@@ -57,21 +56,20 @@
             display: flex; 
             flex-direction: column; 
             align-items: center;
-            background: rgba(15, 23, 42, 0.3); /* Slight overlay */
+            background: rgba(15, 23, 42, 0.3);
         }
 
-        /* فقط روی دسکتاپ محدودیت عرض داشته باشد */
         @media (min-width: 768px) {
             .app-container {
                 max-width: 420px;
-                height: 90vh; /* روی دسکتاپ کمی فاصله از بالا و پایین */
+                height: 90vh;
                 border-radius: 40px;
                 box-shadow: 0 0 50px rgba(0,0,0,0.5);
                 border: 8px solid #1e293b;
             }
         }
 
-        /* --- HERO LOGO TRANSITION --- */
+        /* --- HERO LOGO TRANSITION & ANIMATION (UPDATED) --- */
         #hero-logo-container {
             position: fixed;
             top: 50%;
@@ -84,6 +82,20 @@
             width: 100%;
         }
 
+        /* انیمیشن جدید برای تپش نور */
+        @keyframes glowPulse {
+            0%, 100% {
+                text-shadow: 0 0 0 rgba(96, 165, 250, 0.4), 0 0 10px rgba(255, 255, 255, 0.1);
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                text-shadow: 0 0 0 rgba(96, 165, 250, 0.4), 0 0 10px rgba(255, 255, 255, 0.1);
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
         .hero-text {
             font-size: 4rem; 
             font-weight: 800; 
@@ -91,7 +103,8 @@
             background: linear-gradient(to bottom, #fff, #93c5fd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(96, 165, 250, 0.4);
+            /* اعمال انیمیشن */
+            animation: glowPulse 5s infinite ease-in-out;
             transition: all 1.2s ease;
         }
 
@@ -116,7 +129,6 @@
         
         .menu-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 16px; perspective: 1000px; }
 
-        /* --- IMPROVED MENU ITEMS (Touch Feel) --- */
         .menu-list-item {
             display: flex; align-items: center; justify-content: space-between;
             padding: 18px 24px;
@@ -127,13 +139,12 @@
             border: 1px solid var(--glass-border);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             position: relative; overflow: hidden; cursor: pointer;
-            transition: transform 0.1s ease-out, background 0.3s; /* سریع‌تر برای موبایل */
+            transition: transform 0.1s ease-out, background 0.3s;
             transform-style: preserve-3d;
         }
 
-        /* کلاس فعال برای افکت لمس */
         .menu-list-item.touch-active {
-            transform: scale(0.96) !important; /* فشرده شدن */
+            transform: scale(0.96) !important;
             background: rgba(255, 255, 255, 0.15);
             border-color: rgba(96, 165, 250, 0.6);
             box-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
@@ -154,7 +165,7 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40;
             display: none; flex-direction: column; align-items: center;
             background: transparent; 
-            padding: 85px 0 80px 0; /* Padding bottom increased for navbar space if needed */
+            padding: 85px 0 80px 0;
             overflow-y: auto; opacity: 0; transition: opacity 0.4s ease-out;
             -ms-overflow-style: none; scrollbar-width: none;
         }
@@ -170,21 +181,36 @@
             text-align: center;
         }
 
+        /* --- UPDATED TEAM CAPSULE FOR MOBILE --- */
         .team-capsule {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 8px 8px 8px 14px; margin-bottom: 10px;
-            border-radius: 50px; background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 16px; /* فضای داخلی بیشتر */
+            margin-bottom: 12px;
+            border-radius: 24px; /* گوشه‌های نرم‌تر */
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden; /* برای عدد پس‌زمینه */
         }
-        .team-capsule.gold { background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), transparent); border-color: rgba(255, 215, 0, 0.4); }
-        .team-capsule.silver { background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), transparent); border-color: rgba(192, 192, 192, 0.4); }
-        .team-capsule.bronze { background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), transparent); border-color: rgba(205, 127, 50, 0.4); }
+        
+        /* پس زمینه برای رتبه‌های خاص */
+        .team-capsule.gold { background: linear-gradient(90deg, rgba(234, 179, 8, 0.15), rgba(15, 23, 42, 0.4)); border-color: rgba(234, 179, 8, 0.3); }
+        .team-capsule.silver { background: linear-gradient(90deg, rgba(209, 213, 219, 0.15), rgba(15, 23, 42, 0.4)); border-color: rgba(209, 213, 219, 0.3); }
+        .team-capsule.bronze { background: linear-gradient(90deg, rgba(217, 119, 6, 0.15), rgba(15, 23, 42, 0.4)); border-color: rgba(217, 119, 6, 0.3); }
 
-        .capsule-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); margin-right: 12px; }
-        .points-circle {
-            width: 44px; height: 44px; border-radius: 50%; background: #1e3a8a;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 2px solid rgba(96, 165, 250, 0.5); box-shadow: 0 0 10px rgba(30, 58, 138, 0.8);
+        .capsule-logo { 
+            width: 48px; height: 48px; 
+            border-radius: 50%; object-fit: cover; 
+            border: 2px solid rgba(255,255,255,0.15); 
+            margin-right: 14px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+
+        /* استایل جدید برای نمایش امتیاز */
+        .points-display {
+            display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
+            z-index: 2; min-width: 50px;
         }
 
         /* --- Modals & Buttons --- */
@@ -209,7 +235,6 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         
-        /* Win/Loss Badge */
         .match-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
         .badge-win { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
         .badge-loss { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
@@ -263,9 +288,6 @@
                     <i class="fas fa-chevron-right menu-chevron"></i>
                 </div>
             </div>
-
-            
-           
         </div>
         
         <div id="main-league-screen" class="page-screen">
@@ -421,14 +443,12 @@
     </audio>
 
     <script>
-        // --- 1. Mobile Touch Interaction Logic ---
-        // Instead of just mousemove, we use touch events to create a "press" feel
+        // --- Mobile Logic ---
         const touchCards = document.querySelectorAll('.touch-card');
         
         touchCards.forEach(card => {
-            // Desktop Hover Effect (Existing)
             card.addEventListener('mousemove', (e) => {
-                if(window.innerWidth < 768) return; // Disable 3D tilt on mobile
+                if(window.innerWidth < 768) return; 
                 const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
@@ -443,7 +463,6 @@
                 card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
             });
 
-            // Mobile Touch Effect (New)
             card.addEventListener('touchstart', () => {
                 card.classList.add('touch-active');
             }, {passive: true});
@@ -453,7 +472,7 @@
             });
         });
 
-        // --- Original Logic + New Animation ---
+        // --- Logic ---
         const J_MONTHS_EN = ["Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar", "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"];
         function toEnglishDigits(str) { if (!str) return str; return str.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)); }
         
@@ -477,7 +496,6 @@
             return { date: toEnglishDigits(faDateString), time: localTime };
         }
 
-        // --- Config ---
         const GITHUB_REPO = "rzarisfi/HarfsMusic"; 
         const GITHUB_LEAGUE_BRANCH = "league-data";
         const GITHUB_LEAGUE_FILE = "league_data.json";
@@ -490,11 +508,9 @@
         
         let leagueData = {}, mainLeagueData = {}, sha = null, mainSha = null, matchHistory = [], matchesSha = null, backgroundMusicStarted = false;
 
-        // --- Initialization ---
         function initializeLeagueData() { TEAM_NAMES.forEach(t => leagueData[t] = { name: t, P:0, W:0, D:0, L:0, GF:0, GA:0, Pts:0 }); }
         function initializeMainLeagueData() { TEAM_NAMES.forEach(t => mainLeagueData[t] = { name: t, totalPoints: 0 }); }
 
-        // --- Navigation & Start ---
         function startApp() {
             setTimeout(() => {
                 const logoContainer = document.getElementById('hero-logo-container');
@@ -541,25 +557,46 @@
             if(route === 'history') loadMatchHistoryFromGitHub().then(renderMatchHistory);
         }
 
-        // --- Render Functions ---
+        // --- UPDATED RENDER FUNCTION FOR CHAMPIONSHIP (Mobile Friendly) ---
         function renderMainLeagueTable() {
             document.getElementById('main-loading-message').style.display = 'none';
             const table = Object.values(mainLeagueData).sort((a,b) => b.totalPoints - a.totalPoints);
             
             document.getElementById('main-league-body').innerHTML = table.map((team, index) => {
                 let rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : '';
+                
+                // تعیین رنگ امتیازها بر اساس رتبه
+                let pointColorClass = 'text-white';
+                let pointGlow = '';
+                
+                if (index === 0) {
+                    pointColorClass = 'text-yellow-400';
+                    pointGlow = 'style="text-shadow: 0 0 10px rgba(250, 204, 21, 0.6);"'; // Gold glow
+                } else if (index === 1) {
+                    pointColorClass = 'text-gray-300';
+                    pointGlow = 'style="text-shadow: 0 0 8px rgba(209, 213, 219, 0.4);"'; // Silver glow
+                } else if (index === 2) {
+                    pointColorClass = 'text-yellow-700'; // Bronze (Darker yellow/brown)
+                }
+
+                // ساختار جدید کارت برای نمایش بهتر در موبایل
                 return `
                     <div class="team-capsule ${rankClass}">
-                        <div class="flex items-center">
+                        <div class="absolute -left-1 bottom-[-10px] text-6xl font-black opacity-10 select-none z-0 italic font-mono text-white">
+                            ${index + 1}
+                        </div>
+
+                        <div class="flex items-center z-10 relative flex-grow">
                             <img src="${GITHUB_IMAGE_BASE_URL}${team.name}.png" class="capsule-logo">
-                            <div>
-                                <div class="font-bold text-lg">${TEAM_DISPLAY_NAMES[team.name]}</div>
-                                <div class="text-[10px] text-gray-400 uppercase">Rank #${index + 1}</div>
+                            <div class="flex flex-col justify-center">
+                                <div class="font-bold text-lg leading-tight text-white">${TEAM_DISPLAY_NAMES[team.name]}</div>
+                                <div class="text-[10px] text-blue-300 uppercase tracking-widest opacity-80 mt-0.5">Rank #${index + 1}</div>
                             </div>
                         </div>
-                        <div class="points-circle">
-                            <span class="text-lg font-bold text-yellow-300 leading-none">${team.totalPoints}</span>
-                            <span class="text-[7px] text-blue-200">PTS</span>
+                        
+                        <div class="points-display pl-3">
+                            <span class="text-2xl font-black ${pointColorClass} leading-none" ${pointGlow}>${team.totalPoints}</span>
+                            <span class="text-[8px] text-gray-400 uppercase tracking-wider mt-1">PTS</span>
                         </div>
                     </div>
                 `;
@@ -634,7 +671,6 @@
         function showAdminOptionsModal() { loadMatchHistoryFromGitHub().then(h => { renderAdminHistory(h); document.getElementById('admin-options-modal').style.display='flex'; }); }
         function hideAdminOptionsModal() { document.getElementById('admin-options-modal').style.display='none'; }
         
-        // --- 2. Enhanced Team Profile Logic ---
         function showTeamProfile(key) {
              const t = leagueData[key];
              document.getElementById('profile-team-logo').src = `${GITHUB_IMAGE_BASE_URL}${key}.png`;
@@ -643,12 +679,11 @@
              document.getElementById('profile-stat-p').textContent = t.P;
              document.getElementById('profile-stat-gf').textContent = (t.GF - t.GA) > 0 ? `+${t.GF - t.GA}` : t.GF - t.GA; 
              
-             // Logic to find Last Match
              const lastMatch = matchHistory.find(m => m.home === key || m.away === key);
              const badge = document.getElementById('last-match-result-badge');
              const detail = document.getElementById('last-match-detail');
              
-             badge.className = 'match-badge'; // reset
+             badge.className = 'match-badge';
              
              if(lastMatch) {
                  const isHome = lastMatch.home === key;
@@ -688,7 +723,6 @@
              `).join('');
         }
         
-        // --- GitHub & Data Logic ---
         const BASE_API = `https://api.github.com/repos/${GITHUB_REPO}/contents/`;
         function b64Encode(s) { return btoa(unescape(encodeURIComponent(s))); }
         
@@ -774,24 +808,17 @@
             }
         }
 
-        // --- Start (Fixed for Android/Mobile) ---
         const bgMusic = document.getElementById('background-music');
         
         function initAudio() {
             if (!backgroundMusicStarted && bgMusic) {
                 bgMusic.volume = 0.15;
-                
-                // متد play در اکثر مرورگرهای موبایل یک Promise برمی‌گرداند
                 let playPromise = bgMusic.play();
-                
                 if (playPromise !== undefined) {
                     playPromise.then(_ => {
-                        // پخش با موفقیت شروع شد
                         backgroundMusicStarted = true;
-                        // حذف شنونده‌ها برای بهینه‌سازی
                         removeAudioListeners();
                     }).catch(error => {
-                        // اگر مسدود شد، در لمس بعدی دوباره تلاش می‌کند
                         console.log("Waiting for user interaction to play audio...");
                     });
                 }
@@ -804,12 +831,10 @@
             document.removeEventListener('mousedown', initAudio);
         }
 
-        // گوش دادن به تمام حالت‌های ممکن تعامل کاربر در اندروید و ویندوز
         document.addEventListener('click', initAudio);
         document.addEventListener('touchstart', initAudio, {passive: true});
         document.addEventListener('mousedown', initAudio);
         
-        // مقداردهی اولیه بقیه بخش‌های برنامه
         initializeLeagueData(); 
         initializeMainLeagueData();
         
@@ -818,13 +843,7 @@
             setInterval(updateCurrentDateTime, 60000); 
             startApp(); 
         });
-        
-        initializeLeagueData(); initializeMainLeagueData();
-        document.addEventListener('DOMContentLoaded', () => { updateCurrentDateTime(); setInterval(updateCurrentDateTime, 60000); startApp(); });
 
     </script>
 </body>
 </html>
-
-
-
