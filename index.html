@@ -102,23 +102,25 @@
             transform: translateY(20px); transition: all 0.8s ease 0.5s;
         }
 
-        /* 3. تغییرات کپسول هدر (جلوگیری از تداخل هنگام اسکرول) */
+        /* 3. تغییرات کپسول هدر (جلوگیری از تداخل هنگام اسکرول) - Liquid Glass Applied */
         #hero-logo-container.in-header { 
             top: 25px; 
             transform: translate(-50%, 0); 
-            background: rgba(15, 23, 42, 0.85); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(24px) saturate(180%); 
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 28px; 
             padding: 8px 30px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.05);
             min-width: 220px;
         }
         #hero-logo-container.in-header .hero-text { font-size: 1.8rem; letter-spacing: 4px; }
         #hero-logo-container.in-header .hero-subtext { opacity: 1; transform: translateY(0); font-size: 0.7rem; margin-top: -3px; }
 
-        /* --- Bottom Navigation --- */
+        /* --- Bottom Navigation --- Liquid Glass Applied */
         /* 2. کپسول گزینه‌ها بالاتر آورده شد (bottom: 40px) */
         .bottom-nav {
             position: absolute;
@@ -127,17 +129,19 @@
             transform: translateX(-50%);
             width: 90%;
             max-width: 360px;
-            background: rgba(20, 25, 35, 0.85);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
             border-radius: 9999px; 
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 6px 8px;
             z-index: 100;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
             opacity: 0;
             transition: opacity 0.8s ease;
             pointer-events: none;
