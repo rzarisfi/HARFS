@@ -1,20 +1,20 @@
 {
-  "name": "Harfs League System",
   "short_name": "Harfs League",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#1e1b4b",
+  "name": "Harfs League System",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/rzarisfi/HarfsMusic/league-data/HOSI.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "https://raw.githubusercontent.com/rzarisfi/HarfsMusic/league-data/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
     },
     {
-      "src": "https://raw.githubusercontent.com/rzarisfi/HarfsMusic/league-data/HOSI.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "https://raw.githubusercontent.com/rzarisfi/HarfsMusic/league-data/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
-  ]
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a"
 }
