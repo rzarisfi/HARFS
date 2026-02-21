@@ -708,7 +708,7 @@
                     const selector = document.getElementById('season-selector');
                     selector.innerHTML = '<option value="current">Current Season</option>'; 
                     
-                    archivedSeasons.forEach(season => {
+                    [...archivedSeasons].reverse().forEach(season => {
                         selector.innerHTML += `<option value="${season.seasonId}">Season ${season.seasonId}</option>`;
                     });
                 }
@@ -907,3 +907,4 @@
     </script>
 </body>
 </html>
+
