@@ -6,6 +6,8 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
+    <link rel="manifest" href="./manifest.json">
+    
     <style>
         /* --- Base Styles & Variables --- */
         :root {
@@ -182,6 +184,9 @@
             border-radius: 24px; border: 1px solid rgba(255,255,255,0.08);
             padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .team-capsule {
@@ -203,10 +208,9 @@
 
         .points-display { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; z-index: 2; min-width: 50px; }
 
-        /* --- NEW GRID TABLE (1. فاصله داده‌ها بیشتر و منظم‌تر شد) --- */
+        /* --- NEW GRID TABLE --- */
         .season-grid {
             display: grid;
-            /* عرض ستون‌های عددی افزایش یافت و فضا بهتر توزیع شد */
             grid-template-columns: 24px minmax(65px, 1fr) 26px 26px 26px 26px 30px 30px 32px 38px;
             width: 100%;
         }
@@ -251,7 +255,6 @@
         .badge-loss { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
         .badge-draw { background: rgba(156, 163, 175, 0.2); color: #d1d5db; border: 1px solid rgba(156, 163, 175, 0.4); }
 
-        /* استایل خاص برای اینپوت‌های ادمین */
         .glass-input {
             background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.15); color: white;
@@ -302,6 +305,10 @@
             <div class="league-header">
                 <h2 class="text-xl font-bold text-blue-100 uppercase tracking-widest mb-1">Season Table</h2> 
                 <div class="text-[10px] text-gray-400 font-mono mb-2" id="current-datetime">...</div>
+                
+                <select id="season-selector" class="glass-input mt-2 text-xs p-1.5 rounded-lg outline-none w-40 text-center text-blue-300 font-semibold cursor-pointer" onchange="loadSelectedSeason(this.value)" style="background: rgba(15, 23, 42, 0.8);">
+                    <option value="current">Current Season</option>
+                </select>
             </div>
             
             <div class="w-full px-2">
@@ -423,7 +430,7 @@
     </audio>
 
     <script>
-        // --- Logic ---
+        // --- Logic & Configs ---
         const J_MONTHS_EN = ["Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar", "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"];
         function toEnglishDigits(str) { if (!str) return str; return str.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)); }
         
@@ -457,6 +464,11 @@
         const TEAM_NAMES = ["HOSI", "Sajsfi", "Bayern", "Yellow"];
         const TEAM_DISPLAY_NAMES = { "HOSI": "HOSI", "Sajsfi": "Sajsfi", "Bayern": "Bayern", "Yellow": "Yellow" };
         
+        // --- New variables for Archiving ---
+        const GITHUB_ARCHIVE_FILE = "seasons_archive.json";
+        let archiveSha = null;
+        let archivedSeasons = [];
+
         let leagueData = {}, mainLeagueData = {}, sha = null, mainSha = null, matchHistory = [], matchesSha = null, backgroundMusicStarted = false;
 
         function initializeLeagueData() { TEAM_NAMES.forEach(t => leagueData[t] = { name: t, P:0, W:0, D:0, L:0, GF:0, GA:0, Pts:0 }); }
@@ -500,7 +512,12 @@
             }
 
             if(route === 'main-league') loadMainLeagueDataFromGitHub().then(renderMainLeagueTable);
-            if(route === 'league') Promise.all([loadLeagueDataFromGitHub(), loadMatchHistoryFromGitHub()]).then(([d]) => renderLeagueTable(d));
+            if(route === 'league') Promise.all([loadLeagueDataFromGitHub(), loadMatchHistoryFromGitHub()]).then(([d]) => {
+                // ریست کردن سلکتور به فصل جاری وقتی وارد این صفحه می‌شویم
+                const selector = document.getElementById('season-selector');
+                if(selector) selector.value = 'current';
+                renderLeagueTable(d);
+            });
             if(route === 'history') loadMatchHistoryFromGitHub().then(renderMatchHistory);
         }
 
@@ -536,10 +553,9 @@
             }).join('');
         }
 
-        function renderLeagueTable(data) {
-            leagueData = data;
+        function renderLeagueTable(dataToRender) {
             document.getElementById('loading-message').style.display = 'none';
-            const table = Object.values(leagueData).sort((a,b) => (b.Pts - a.Pts) || ((b.GF-b.GA) - (a.GF-a.GA)));
+            const table = Object.values(dataToRender).sort((a,b) => (b.Pts - a.Pts) || ((b.GF-b.GA) - (a.GF-a.GA)));
 
             const tbody = document.getElementById('league-table-body');
             tbody.innerHTML = table.map((t, i) => `
@@ -560,7 +576,6 @@
                 </div>
             `).join('');
             
-            // استایل دار کردن بک‌گراند گزینه‌ها تا روی سیستم‌عامل‌های مختلف خوانا باشد
             const opts = TEAM_NAMES.map(t => `<option value="${t}" style="background: #1e293b; color: white;">${TEAM_DISPLAY_NAMES[t]}</option>`).join('');
             document.getElementById('home-team-select').innerHTML = opts;
             document.getElementById('away-team-select').innerHTML = opts;
@@ -611,7 +626,7 @@
         function showAdminOptions() {
             if(!checkAdminAccess()) { alert("Wrong password"); return; }
             let t = localStorage.getItem('github_pat');
-            if(!t) { t = prompt("Enter GitHub PAT:"); if(!t) return; localStorage.setItem('github_pat', t); sha=null; mainSha=null; matchesSha=null; }
+            if(!t) { t = prompt("Enter GitHub PAT:"); if(!t) return; localStorage.setItem('github_pat', t); sha=null; mainSha=null; matchesSha=null; archiveSha=null; }
             if(confirm("Register Match (OK) or Manage (Cancel)?")) showRegistrationModal(); else showAdminOptionsModal();
         }
         function showRegistrationModal() { document.getElementById('match-registration-modal').style.display='flex'; }
@@ -621,6 +636,7 @@
         
         function showTeamProfile(key) {
              const t = leagueData[key];
+             if(!t) return; // اگر دیتای قدیمی کلیک شد کرش نکند
              document.getElementById('profile-team-logo').src = `${GITHUB_IMAGE_BASE_URL}${key}.png`;
              document.getElementById('profile-team-name').textContent = TEAM_DISPLAY_NAMES[key];
              document.getElementById('profile-stat-pts').textContent = t.Pts;
@@ -662,7 +678,6 @@
         }
         function hideTeamProfile() { document.getElementById('team-profile-modal').style.display = 'none'; }
 
-        // 5. دیزاین جدید و همگام‌سازی شده‌ی مدیریت تاریخچه بازی‌ها در پنل ادمین
         function renderAdminHistory(h) {
              document.getElementById('admin-history-list').innerHTML = h.map((m,i) => `
                 <div class="flex justify-between items-center bg-white bg-opacity-5 border border-white border-opacity-10 p-2.5 mb-2 rounded-xl text-xs transition hover:bg-opacity-10">
@@ -681,6 +696,38 @@
         const BASE_API = `https://api.github.com/repos/${GITHUB_REPO}/contents/`;
         function b64Encode(s) { return btoa(unescape(encodeURIComponent(s))); }
         
+        // --- GitHub Loaders ---
+        async function loadArchiveDropdown() {
+            try {
+                const r = await fetch(`${BASE_API}${GITHUB_ARCHIVE_FILE}?ref=${GITHUB_LEAGUE_BRANCH}`);
+                if(r.ok) {
+                    const d = await r.json();
+                    archiveSha = d.sha;
+                    archivedSeasons = await (await fetch(d.download_url)).json();
+                    
+                    const selector = document.getElementById('season-selector');
+                    selector.innerHTML = '<option value="current">Current Season</option>'; 
+                    
+                    archivedSeasons.forEach(season => {
+                        selector.innerHTML += `<option value="${season.seasonId}">Season ${season.seasonId}</option>`;
+                    });
+                }
+            } catch(e) { console.log("No archives yet or error loading archives."); }
+        }
+
+        function loadSelectedSeason(val) {
+            if(val === "current") {
+                renderLeagueTable(leagueData);
+            } else {
+                const selectedSeason = archivedSeasons.find(s => s.seasonId == val);
+                if(selectedSeason) {
+                    const legacyData = {};
+                    selectedSeason.table.forEach(t => legacyData[t.name] = t);
+                    renderLeagueTable(legacyData);
+                }
+            }
+        }
+
         async function loadMainLeagueDataFromGitHub() {
             if(!Object.keys(mainLeagueData).length) initializeMainLeagueData();
             try {
@@ -702,7 +749,8 @@
             } catch(e) { matchHistory=[]; } return matchHistory;
         }
 
-        async function saveFile(filename, data, msg, currentSha, isMain=false, isHistory=false) {
+        // --- GitHub Savers ---
+        async function saveFile(filename, data, msg, currentSha) {
             const token = localStorage.getItem('github_pat');
             if(!token) return false;
             let content = b64Encode(JSON.stringify(data, null, 2));
@@ -710,13 +758,20 @@
             if(currentSha) body.sha = currentSha;
             try {
                 const r = await fetch(`${BASE_API}${filename}`, { method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-                if(r.ok) { const d = await r.json(); if(isMain) mainSha=d.content.sha; else if(isHistory) matchesSha=d.content.sha; else sha=d.content.sha; return true; }
+                if(r.ok) { 
+                    const d = await r.json(); 
+                    if(filename === GITHUB_MAIN_LEAGUE_FILE) mainSha=d.content.sha; 
+                    else if(filename === GITHUB_MATCHES_FILE) matchesSha=d.content.sha;
+                    else if(filename === GITHUB_ARCHIVE_FILE) archiveSha=d.content.sha;
+                    else sha=d.content.sha; 
+                    return true; 
+                }
             } catch(e) { console.error(e); } return false;
         }
         
-        async function saveMainLeagueDataToGitHub(d, m) { const toSave={}; Object.keys(d).forEach(k=>{const{name,...rest}=d[k];toSave[k]=rest;}); return saveFile(GITHUB_MAIN_LEAGUE_FILE, toSave, m, mainSha, true); }
+        async function saveMainLeagueDataToGitHub(d, m) { const toSave={}; Object.keys(d).forEach(k=>{const{name,...rest}=d[k];toSave[k]=rest;}); return saveFile(GITHUB_MAIN_LEAGUE_FILE, toSave, m, mainSha); }
         async function saveLeagueDataToGitHub(d, m) { const toSave={}; Object.keys(d).forEach(k=>{const{name,...rest}=d[k];toSave[k]=rest;}); return saveFile(GITHUB_LEAGUE_FILE, toSave, m, sha); }
-        async function saveMatchHistoryToGitHub(d, m) { return saveFile(GITHUB_MATCHES_FILE, d, m, matchesSha, false, true); }
+        async function saveMatchHistoryToGitHub(d, m) { return saveFile(GITHUB_MATCHES_FILE, d, m, matchesSha); }
 
         function updateTeamStats(t, gf, ga) { t.P++; t.GF+=gf; t.GA+=ga; if(gf>ga){t.W++;t.Pts+=3;}else if(gf===ga){t.D++;t.Pts+=1;}else{t.L++;} }
         
@@ -742,20 +797,59 @@
             }
         }
         
+        // --- Finish Season & Archive Logic ---
+        async function archiveCurrentSeason(finalTable, finalHistory) {
+            try {
+                const r = await fetch(`${BASE_API}${GITHUB_ARCHIVE_FILE}?ref=${GITHUB_LEAGUE_BRANCH}`);
+                if(r.ok) {
+                    const d = await r.json();
+                    archiveSha = d.sha;
+                    archivedSeasons = await (await fetch(d.download_url)).json();
+                }
+            } catch(e) { console.log("Archive file not found, creating a new one."); }
+            
+            const seasonNumber = archivedSeasons.length + 1;
+            archivedSeasons.push({
+                seasonId: seasonNumber,
+                date: new Date().toISOString(),
+                table: finalTable,
+                history: finalHistory
+            });
+            
+            await saveFile(GITHUB_ARCHIVE_FILE, archivedSeasons, `Archived Season ${seasonNumber}`, archiveSha);
+            loadArchiveDropdown(); // Update the dropdown after archiving
+        }
+
         async function finishSeason() {
-            if(confirm("Finish Season? Top 3 get points.")) {
-                const sorted = Object.values(leagueData).sort((a,b)=>b.Pts-a.Pts);
-                [3,2,1].forEach((p,i) => { if(sorted[i]) mainLeagueData[sorted[i].name].totalPoints += p; });
-                await saveMainLeagueDataToGitHub(mainLeagueData, "Season End");
-                matchHistory=[]; initializeLeagueData();
-                await saveMatchHistoryToGitHub(matchHistory, "Reset");
-                await saveLeagueDataToGitHub(leagueData, "Reset");
+            if(confirm("Are you sure you want to end the season? Top 3 teams get points and the season will be archived.")) {
+                
+                await loadMainLeagueDataFromGitHub();
+                
+                const sorted = Object.values(leagueData).sort((a,b) => (b.Pts - a.Pts) || ((b.GF-b.GA) - (a.GF-a.GA)));
+                
+                const pointsToAward = [3, 2, 1];
+                pointsToAward.forEach((points, index) => { 
+                    if(sorted[index] && mainLeagueData[sorted[index].name]) {
+                        mainLeagueData[sorted[index].name].totalPoints += points; 
+                    }
+                });
+
+                await archiveCurrentSeason(sorted, matchHistory);
+
+                await saveMainLeagueDataToGitHub(mainLeagueData, "Season End: Points Applied");
+                
+                matchHistory = []; 
+                initializeLeagueData();
+                await saveMatchHistoryToGitHub(matchHistory, "Reset matches for new season");
+                await saveLeagueDataToGitHub(leagueData, "Reset league for new season");
+                
+                hideAdminOptionsModal();
                 navigate('main-league');
             }
         }
         
         async function resetLeagueConfirm() {
-            if(confirm("FULL RESET?")) {
+            if(confirm("FULL RESET? (This won't archive the data)")) {
                 matchHistory=[]; initializeLeagueData();
                 await saveMatchHistoryToGitHub(matchHistory, "Reset");
                 await saveLeagueDataToGitHub(leagueData, "Reset");
@@ -796,10 +890,20 @@
         document.addEventListener('DOMContentLoaded', () => { 
             updateCurrentDateTime(); 
             setInterval(updateCurrentDateTime, 60000); 
+            loadArchiveDropdown();
             startApp(); 
         });
 
     </script>
-</body>
 
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker Registered'))
+                .catch(err => console.error('Service Worker Error', err));
+            });
+        }
+    </script>
+</body>
 </html>
